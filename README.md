@@ -29,7 +29,7 @@ tests run on LuaJIT. The reason is that I'm only interested in LuaJIT (and OpenR
 
 ```moonscript
     users = Relativity.table 'users'
-    users\project(Relativity.star!).to_sql!
+    users\project(Relativity.star).to_sql!
 ```
 
 Generates
