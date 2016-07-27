@@ -30,8 +30,11 @@ to_lua_cmd = func name: "Compile lua", handler: (newname, ev) ->
     return false
   io.stdout\write colors("\n[ %{green}Compiled #{changed_file} to lua file #{newname}: %{white}All good ]\n\n")
   lua_file = io.open(newname, 'w+')
-  lua_file\write as_lua
-  lua_file\close!
+  if lua_file
+    lua_file\write as_lua
+    lua_file\close!
+  else
+    io.stdout\write colors("\n[ %{red}Compile to lua error ]\n%{white}Couldn't write to '#{newname}'\n\n")
   true
 
 -- Directories to watch for changes, how to map detected changes to
@@ -44,7 +47,7 @@ watch "lib", "spec", ->
   on_changed "^lib/(.*)%.moon", (a) ->
     lint_cmd("lib/#{a}.moon") +
     spec_cmd("spec/#{a}_spec.moon") +
-    to_lua_cmd("lua/#{a}.lua")
+    to_lua_cmd("lib/#{a}.lua")
 
 watch "playground", ->
   on_changed "^playground/(.*)%.moon", (a) ->
