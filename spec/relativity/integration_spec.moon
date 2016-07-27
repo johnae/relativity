@@ -9,7 +9,7 @@ describe 'Relativity', ->
     assert.equal 'SELECT FROM "users" WHERE "users"."name" = \'Einstein\'', users\where(users('name')\eq('Einstein'))\to_sql!
 
   it 'selects all from users', ->
-    assert.equal 'SELECT * FROM "users"', users\project(Relativity.star!)\to_sql!
+    assert.equal 'SELECT * FROM "users"', users\project(Relativity.star)\to_sql!
 
   it 'selects users where either condition is true', ->
     assert.is_like [[

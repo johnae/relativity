@@ -11,7 +11,7 @@ describe 'Querying', ->
 
     describe '#project', ->
       it 'accepts sql literals', ->
-        sm\project Relativity\sql 'id'
+        sm\project Relativity.sql 'id'
         assert.equal sm\to_sql!, "SELECT id FROM \"users\""
 
       it 'accepts string constants', ->
@@ -35,7 +35,7 @@ describe 'Querying', ->
     describe '#as', ->
 
       it 'makes an AS node by grouping the AST', ->
-        as = sm\as Relativity\sql('foo')
+        as = sm\as Relativity.sql('foo')
         assert.equal Nodes.Grouping, as.left
         assert.equal sm.ast, as.left.value
         assert.equal 'foo', tostring(as.right)
@@ -46,7 +46,7 @@ describe 'Querying', ->
 
       it 'converting to sql returns proper AS sql', ->
         sub = Relativity\select!\project(1)
-        outer = Relativity\select!\from(sub\as('x'))\project(Relativity\star!)
+        outer = Relativity\select!\from(sub\as('x'))\project(Relativity.star)
         assert.equal 'SELECT * FROM (SELECT 1) "x"', outer\to_sql!
 
       describe 'As', ->
@@ -144,11 +144,11 @@ describe 'Querying', ->
       before_each ->
         table = Table.new 'users'
         m1 = SelectManager.new table
-        m1\project Relativity\star!
+        m1\project Relativity.star
         m1\where table('age')\lt 18
 
         m2 = SelectManager.new table
-        m2\project Relativity\star!
+        m2\project Relativity.star
         m2\where table('age')\gt 99
 
       it 'unions two managers', ->
@@ -164,12 +164,12 @@ describe 'Querying', ->
       before_each ->
         table = Table.new 'users'
         m1 = SelectManager.new table
-        m1\project Relativity\star!
-        m1\where table('age')\In(Relativity\range(18,60))
+        m1\project Relativity.star
+        m1\where table('age')\In(Relativity.range(18,60))
 
         m2 = SelectManager.new table
-        m2\project Relativity\star!
-        m2\where table('age')\In(Relativity\range(40,99))
+        m2\project Relativity.star
+        m2\where table('age')\In(Relativity.range(40,99))
 
       it 'excepts two managers', ->
         node = m1\except m2
@@ -181,11 +181,11 @@ describe 'Querying', ->
       before_each ->
         table = Table.new 'users'
         m1 = SelectManager.new table
-        m1\project Relativity\star!
+        m1\project Relativity.star
         m1\where table('age')\gt 18
 
         m2 = SelectManager.new table
-        m2\project Relativity\star!
+        m2\project Relativity.star
         m2\where table('age')\lt 99
 
       it 'intersects two managers', ->
@@ -212,7 +212,7 @@ describe 'Querying', ->
         as_statement = Nodes.As.new replies, union
 
         mgr = SelectManager.new!
-        mgr\With('recursive', as_statement)\from(replies)\project(Relativity\star!)
+        mgr\With('recursive', as_statement)\from(replies)\project(Relativity.star)
 
         assert.equal 'WITH RECURSIVE "replies" AS ((SELECT "comments"."id", "comments"."parent_id" FROM "comments" WHERE "comments"."id" = 42) UNION (SELECT "comments"."id", "comments"."parent_id" FROM "comments" INNER JOIN "replies" ON "comments"."parent_id" = "replies"."id")) SELECT * FROM "replies"', mgr\to_sql!
 
@@ -251,7 +251,7 @@ describe 'Querying', ->
       it 'generates order clauses', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
-        mgr\project Relativity\star!
+        mgr\project Relativity.star
         mgr\from table
         mgr\order table('id')
         assert.equal 'SELECT * FROM "users" ORDER BY "users"."id"', mgr\to_sql!
@@ -259,7 +259,7 @@ describe 'Querying', ->
       it 'takes variable number of arguments', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
-        mgr\project Relativity\star!
+        mgr\project Relativity.star
         mgr\from table
         mgr\order table('id'), table('name')
         assert.equal 'SELECT * FROM "users" ORDER BY "users"."id", "users"."name"', mgr\to_sql!
@@ -272,7 +272,7 @@ describe 'Querying', ->
       it 'supports order direction', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
-        mgr\project Relativity\star!
+        mgr\project Relativity.star
         mgr\from table
         mgr\order table('id')\asc!, table('name')\desc!
         assert.equal 'SELECT * FROM "users" ORDER BY "users"."id" ASC, "users"."name" DESC', mgr\to_sql!
@@ -477,7 +477,7 @@ describe 'Querying', ->
         predicate = left('id')\eq right('id')
 
         mgr = left\join right
-        mgr\project Relativity\sql('*')
+        mgr\project Relativity.sql('*')
         assert.equal SelectManager, mgr\on(predicate)
 
         assert.equal 'SELECT * FROM "users" INNER JOIN "users" "users_2" ON "users"."id" = "users_2"."id"', mgr\to_sql!
@@ -510,7 +510,7 @@ describe 'Querying', ->
       it 'work in from', ->
         a = Relativity\select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))\as('a')
         b = Relativity\select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))\as('b')
-        q = Relativity\select!\from(a)\join(b, Nodes.LeftOuterJoin)\on(a('x')\eq(b 'x'))\project Relativity\star!
+        q = Relativity\select!\from(a)\join(b, Nodes.LeftOuterJoin)\on(a('x')\eq(b 'x'))\project Relativity.star
         assert.equal 'SELECT * FROM (SELECT 1 AS "x") "a" LEFT OUTER JOIN (SELECT 1 AS "x") "b" ON "a"."x" = "b"."x"', q\to_sql!
 
       it 'work in project', ->
@@ -549,9 +549,9 @@ describe 'Querying', ->
         ]], q\to_sql!
 
     it 'constant literals', ->
-      assert.equal "SELECT NOT ('f')", Relativity\select!\project(Relativity\lit(false)\Not!)\to_sql!
-      assert.equal "SELECT 3 = 3", Relativity\select!\project(Relativity\lit(3)\eq(Relativity\lit(3)))\to_sql!
-      assert.equal "SELECT 'a' IN ('a')", Relativity\select!\project(Relativity\lit('a')\In(Relativity\lit({'a'})))\to_sql!
+      assert.equal "SELECT NOT ('f')", Relativity\select!\project(Relativity.lit(false)\Not!)\to_sql!
+      assert.equal "SELECT 3 = 3", Relativity\select!\project(Relativity.lit(3)\eq(Relativity.lit(3)))\to_sql!
+      assert.equal "SELECT 'a' IN ('a')", Relativity\select!\project(Relativity.lit('a')\In(Relativity.lit({'a'})))\to_sql!
 
     it 'cast', ->
-      assert.equal 'SELECT CAST(3 AS "int")', Relativity\select!\project(Relativity\cast(3, 'int'))\to_sql!
+      assert.equal 'SELECT CAST(3 AS "int")', Relativity\select!\project(Relativity.cast(3, 'int'))\to_sql!

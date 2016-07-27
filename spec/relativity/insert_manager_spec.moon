@@ -15,7 +15,7 @@ describe 'InsertManager', ->
     assert.equal 2, #values.right
 
   it 'allows sql literals', ->
-    im.values = im\create_values({Relativity\star!}, {'a'})
+    im.values = im\create_values({Relativity.star}, {'a'})
     assert.equal 'INSERT INTO NULL VALUES (*)', im\to_sql!
 
   it 'inserts false', ->
@@ -23,7 +23,7 @@ describe 'InsertManager', ->
     assert.equal 'INSERT INTO "users" ("bool") VALUES (\'f\')', im\to_sql!
 
   it 'inserts null', ->
-    im\insert {{users('id'), Nodes.SqlLiteral.new('NULL')}}
+    im\insert {{users('id'), Relativity.null}}
     assert.equal 'INSERT INTO "users" ("id") VALUES (NULL)', im\to_sql!
 
   -- TODO: handle this properly somewhere

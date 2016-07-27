@@ -10,28 +10,26 @@ CaseBuilder = require 'relativity.nodes.case_builder'
 null = Null.new!
 star = SqlLiteral.new '*'
 
+local Relativity
+
+sql = (raw_sql) -> SqlLiteral.new raw_sql
+as = (a,b) -> As.new a, UnqualifiedName.new(b)
+func = (name) -> (...) ->
+  args = {...}
+  FunctionNode.new args, sql(name)
+
 {
   VERSION: '0.0.1'
 
-  sql: (raw_sql) =>
-    SqlLiteral.new raw_sql
+  :sql
+  :null
+  :star
+  :as
+  :func
 
-  null: -> null
-
-  star: -> star
-
-  range: (start, finish) =>
-    Range.new start, finish
-
-  func: (name) => (...) ->
-    args = {...}
-    FunctionNode.new args, @sql(name)
-
-  lit: (value) => ConstLit.new value
-
-  as: (a,b) => As.new a, UnqualifiedName.new(b)
-
-  cast: (a,b) => @func('CAST') @as(a, b)
+  range: (start, finish) -> Range.new start, finish
+  lit: (value) -> ConstLit.new value
+  cast: (a,b) -> func('CAST') as(a, b)
 
   :Nodes
   :Table
