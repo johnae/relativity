@@ -45,17 +45,17 @@ describe 'Querying', ->
         assert.equal Nodes.SqlLiteral, as.right
 
       it 'converting to sql returns proper AS sql', ->
-        sub = Relativity\select!\project(1)
-        outer = Relativity\select!\from(sub\as('x'))\project(Relativity.star)
+        sub = Relativity.select!\project(1)
+        outer = Relativity.select!\from(sub\as('x'))\project(Relativity.star)
         assert.equal 'SELECT * FROM (SELECT 1) "x"', outer\to_sql!
 
       describe 'As', ->
         it 'supports SqlLiteral', ->
-          sel = Relativity\select!\project(Nodes.As.new(1, Nodes.SqlLiteral.new('x')))
+          sel = Relativity.select!\project(Nodes.As.new(1, Nodes.SqlLiteral.new('x')))
           assert.equal 'SELECT 1 AS x', sel\to_sql!
 
         it 'supports UnqualifiedName', ->
-          sel = Relativity\select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))
+          sel = Relativity.select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))
           assert.equal 'SELECT 1 AS "x"', sel\to_sql!
 
     describe 'from', ->
@@ -508,32 +508,32 @@ describe 'Querying', ->
     describe 'subqueries', ->
 
       it 'work in from', ->
-        a = Relativity\select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))\as('a')
-        b = Relativity\select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))\as('b')
-        q = Relativity\select!\from(a)\join(b, Nodes.LeftOuterJoin)\on(a('x')\eq(b 'x'))\project Relativity.star
+        a = Relativity.select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))\as('a')
+        b = Relativity.select!\project(Nodes.As.new(1, Nodes.UnqualifiedName.new('x')))\as('b')
+        q = Relativity.select!\from(a)\join(b, Nodes.LeftOuterJoin)\on(a('x')\eq(b 'x'))\project Relativity.star
         assert.equal 'SELECT * FROM (SELECT 1 AS "x") "a" LEFT OUTER JOIN (SELECT 1 AS "x") "b" ON "a"."x" = "b"."x"', q\to_sql!
 
       it 'work in project', ->
-        a = Relativity\select!\project 1
-        b = Relativity\select!\project 1
-        q = Relativity\select!\project a\eq(b)
+        a = Relativity.select!\project 1
+        b = Relativity.select!\project 1
+        q = Relativity.select!\project a\eq(b)
         assert.equal 'SELECT (SELECT 1) = (SELECT 1)', q\to_sql!
 
     it 'comparators all work', ->
       t = Relativity.table 'x'
-      q = Relativity\select!\project t('x')\lt(2), t('x')\lteq(2), t('x')\gt(2), t('x')\gteq(2), t('x')\not_eq(2), t('x')\is_null!, t('x')\not_null!, t('x')\like('%John%'), t('x')\ilike('%john%')
+      q = Relativity.select!\project t('x')\lt(2), t('x')\lteq(2), t('x')\gt(2), t('x')\gteq(2), t('x')\not_eq(2), t('x')\is_null!, t('x')\not_null!, t('x')\like('%John%'), t('x')\ilike('%john%')
       assert.equal 'SELECT "x"."x" < 2, "x"."x" <= 2, "x"."x" > 2, "x"."x" >= 2, "x"."x" <> 2, "x"."x" IS NULL, "x"."x" IS NOT NULL, "x"."x" LIKE \'%John%\', "x"."x" ILIKE \'%john%\'', q\to_sql!
 
     it 'nulls', ->
-      assert.equal 'SELECT NULL', Relativity\select!\project(Nodes.SqlLiteral.new('NULL'))\to_sql!
+      assert.equal 'SELECT NULL', Relativity.select!\project(Nodes.SqlLiteral.new('NULL'))\to_sql!
 
     describe 'case', ->
 
       it 'creates a case statement', ->
-        t = Relativity\table 'users'
-        q = Relativity\select!\from t
-        q\project Relativity\case!\When(t('age')\lt(18), 'underage')\When(t('age')\gteq(18), 'OK')\Else(Nodes.SqlLiteral.new('NULL'))\End!
-        q\project Relativity\case(t('protection'))\When('private', true)\When('public', false)\End!\as('private')
+        t = Relativity.table 'users'
+        q = Relativity.select!\from t
+        q\project Relativity.case!\When(t('age')\lt(18), 'underage')\When(t('age')\gteq(18), 'OK')\Else(Nodes.SqlLiteral.new('NULL'))\End!
+        q\project Relativity.case(t('protection'))\When('private', true)\When('public', false)\End!\as('private')
         assert.is_like [[
           SELECT
           CASE
@@ -549,9 +549,9 @@ describe 'Querying', ->
         ]], q\to_sql!
 
     it 'constant literals', ->
-      assert.equal "SELECT NOT ('f')", Relativity\select!\project(Relativity.lit(false)\Not!)\to_sql!
-      assert.equal "SELECT 3 = 3", Relativity\select!\project(Relativity.lit(3)\eq(Relativity.lit(3)))\to_sql!
-      assert.equal "SELECT 'a' IN ('a')", Relativity\select!\project(Relativity.lit('a')\In(Relativity.lit({'a'})))\to_sql!
+      assert.equal "SELECT NOT ('f')", Relativity.select!\project(Relativity.lit(false)\Not!)\to_sql!
+      assert.equal "SELECT 3 = 3", Relativity.select!\project(Relativity.lit(3)\eq(Relativity.lit(3)))\to_sql!
+      assert.equal "SELECT 'a' IN ('a')", Relativity.select!\project(Relativity.lit('a')\In(Relativity.lit({'a'})))\to_sql!
 
     it 'cast', ->
-      assert.equal 'SELECT CAST(3 AS "int")', Relativity\select!\project(Relativity.cast(3, 'int'))\to_sql!
+      assert.equal 'SELECT CAST(3 AS "int")', Relativity.select!\project(Relativity.cast(3, 'int'))\to_sql!
