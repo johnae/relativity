@@ -9,7 +9,6 @@ local SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null
 SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null = Nodes.SqlLiteral, Nodes.FunctionNode, Nodes.ConstLit, Nodes.UnqualifiedName, Nodes.As, Nodes.Null
 local null = Null.new()
 local star = SqlLiteral.new('*')
-local Relativity
 local sql
 sql = function(raw_sql)
   return SqlLiteral.new(raw_sql)

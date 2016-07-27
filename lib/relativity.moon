@@ -9,9 +9,6 @@ CaseBuilder = require 'relativity.nodes.case_builder'
 
 null = Null.new!
 star = SqlLiteral.new '*'
-
-local Relativity
-
 sql = (raw_sql) -> SqlLiteral.new raw_sql
 as = (a,b) -> As.new a, UnqualifiedName.new(b)
 func = (name) -> (...) ->
