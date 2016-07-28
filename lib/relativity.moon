@@ -4,13 +4,15 @@ Table = require 'relativity.table'
 SelectManager = require 'relativity.select_manager'
 InsertManager = require 'relativity.select_manager'
 UpdateManager = require 'relativity.select_manager'
+DeleteManager = require 'relativity.delete_manager'
 CaseBuilder = require 'relativity.nodes.case_builder'
-{:SqlLiteral, :FunctionNode, :ConstLit, :UnqualifiedName, :As, :Null} = Nodes
+{:SqlLiteral, :FunctionNode, :ConstLit, :UnqualifiedName, :As, :Null, :ArrayAgg, :TableAlias} = Nodes
 
 null = Null.new!
 star = SqlLiteral.new '*'
 sql = (raw_sql) -> SqlLiteral.new raw_sql
 as = (a,b) -> As.new a, UnqualifiedName.new(b)
+alias = (a, b) -> TableAlias.new a, b
 func = (name) -> (...) ->
   args = {...}
   FunctionNode.new args, sql(name)
@@ -22,6 +24,7 @@ func = (name) -> (...) ->
   :null
   :star
   :as
+  :alias
   :func
 
   range: (start, finish) -> Range.new start, finish
@@ -35,5 +38,7 @@ func = (name) -> (...) ->
   select: -> SelectManager.new!
   insert: -> InsertManager.new!
   update: -> UpdateManager.new!
+  delete: -> DeleteManager.new!
   case: (...) -> CaseBuilder.new ...
+  array_agg: (...) -> ArrayAgg.new ...
 }

@@ -1,4 +1,7 @@
+-- This file doubles as spec and playground for some specific postgres functionality
+
 Relativity = require 'relativity'
+Nodes = require 'relativity.nodes.nodes'
 
 describe 'Relativity', ->
   local users
@@ -6,14 +9,47 @@ describe 'Relativity', ->
     users = Relativity.table 'users'
 
   it 'performs a users find', ->
-    assert.equal 'SELECT FROM "users" WHERE "users"."name" = \'Einstein\'', users\where(users('name')\eq('Einstein'))\to_sql!
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."name" = 'Einstein'
+    ]], users\where(users('name')\eq('Einstein'))\to_sql!
 
   it 'selects all from users', ->
     assert.equal 'SELECT * FROM "users"', users\project(Relativity.star)\to_sql!
 
   it 'selects users where either condition is true', ->
-    assert.is_like [[
+    assert.equal tr[[
       SELECT FROM "users"
-      WHERE ("users"."name" = \'bob\' OR "users"."age" < 25)'
+      WHERE ("users"."name" = 'bob' OR "users"."age" < 25)
     ]], users\where(users('name')\eq('bob')\Or(users('age')\lt(25)))\to_sql!
 
+  describe 'advanced postgres queries', ->
+
+    it 'selecting json objects', ->
+      userinfo = users\json 'id', 'name'
+      userinfo = Relativity.as userinfo, 'userinfo'
+      user = users\project(userinfo)\where users('id')\eq(10)
+      assert.equal tr[[
+        SELECT json_build_object('id'::text, "users"."id", 'name'::text, "users"."name") AS "userinfo"
+        FROM "users"
+        WHERE "users"."id" = 10
+      ]], user\to_sql!
+
+
+    it 'lateral inner joined subquery with aggregated json objects', ->
+
+      others = Relativity.table 'others'
+
+      json_select = Relativity.select!
+      json_select\project Relativity.as Relativity.array_agg(others\json('id', 'name')), "list"
+      json_select = Relativity.alias json_select, 'things'
+
+      u = users\project Nodes.TableStar.new(users), Relativity.as(Nodes.ToJson.new(Relativity.table("things")("list")), "things")
+      u\join(json_select, Nodes.InnerJoinLateral)\on(true)
+
+      assert.equal tr[[
+        SELECT "users".*, to_json("things"."list") AS "things"
+        FROM "users"
+        INNER JOIN LATERAL
+        (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list") "things" ON 't'
+      ]], u\to_sql!

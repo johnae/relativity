@@ -81,7 +81,7 @@ SelectManager.collapse = (exprs, existing=nil) =>
 SelectManager.join = (relation, klazz) =>
   return @ unless relation
   klazz or= Nodes.InnerJoin
-  if relation.is_a[Nodes.SqlLiteral] or type(relation) == 'string'
+  if type(relation) == 'string' or relation.is_a[Nodes.SqlLiteral]
     klazz = Nodes.StringJoin
   r_sources = @ctx.source.right
   r_sources[#r_sources + 1] = @create_join relation, nil, klazz

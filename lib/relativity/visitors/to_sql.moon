@@ -4,7 +4,7 @@ Nodes = require 'relativity.nodes.nodes'
 Attributes = require 'relativity.attributes'
 {:Attribute} = Attributes
 {:SelectStatement, :In, :SqlLiteral} = Nodes
-{:concat, :empty, :any} = table
+{:concat, :empty, :any, :sort} = table
 
 ToSql = MultiMethod.new (node) ->
   node_type = type(node)
@@ -196,6 +196,11 @@ ToSql.InnerJoin = (node) =>
   join = "#{join} #{@ node.right}" if node.right and any(node.right)
   join
 
+ToSql.InnerJoinLateral = (node) =>
+  join = "INNER JOIN LATERAL #{@ node.left}"
+  join = "#{join} #{@ node.right}" if node.right and any(node.right)
+  join
+
 ToSql.On = (node) =>
   "ON #{@ node.value}"
 
@@ -271,22 +276,62 @@ ToSql.Equality = (node) =>
   else
     "#{@ node.left} IS NULL"
 
+ToSql.Any = (node) =>
+  right = node.right
+  "#{@ node.left} = ANY(#{@ right})"
+
+ToSql.ToJson = (node) =>
+  "to_json(#{@ node.value})"
+
+ToSql.ArrayAgg = (node) =>
+  "array_agg(#{@ node.value})"
+
+ToSql.JsonBuildObject = (node) =>
+  json = {}
+  value = node.value
+  -- sorting them to get the same ordering every time
+  keys = [k for k,v in pairs value]
+  sort keys
+  for key in *keys
+    json[#json + 1] = "'#{key}'::text"
+    json[#json + 1] = "#{@ value[key]}"
+  --for k, v in pairs node.value
+  --  json[#json + 1] = "'#{k}'::text"
+  --  json[#json + 1] = "#{@ v}"
+  "json_build_object(#{concat json, ', '})"
+
 ToSql.Lock = (node) =>
 
-ToSql.outer_join_type = (node, join_type) =>
-  "#{join_type} OUTER JOIN #{@ node.left} #{@ node.right}"
+ToSql.outer_join_type = (node, join_type, lateral=false) =>
+  join = if lateral
+    "#{join_type} OUTER JOIN LATERAL #{@ node.left}"
+  else
+    "#{join_type} OUTER JOIN #{@ node.left}"
+  join = "#{join} #{@ node.right}" if node.right
+  join
 
 ToSql.LeftOuterJoin = (node) =>
   @outer_join_type node, 'LEFT'
 
+ToSql.LeftOuterJoinLateral = (node) =>
+  @outer_join_type node, 'LEFT', true
+
 ToSql.RightOuterJoin = (node) =>
   @outer_join_type node, 'RIGHT'
+
+ToSql.RightOuterJoinLateral = (node) =>
+  @outer_join_type node, 'RIGHT', true
 
 ToSql.FullOuterJoin = (node) =>
   @outer_join_type node, 'FULL'
 
+ToSql.FullOuterJoinLateral = (node) =>
+  @outer_join_type node, 'FULL', true
+
 ToSql.StringJoin = (node) =>
-  @ node.left
+  join = @ node.left
+  join = "#{join} #{@ node.right}" if node.right and any(node.right)
+  join
 
 ToSql.Top = (node) => nil
 

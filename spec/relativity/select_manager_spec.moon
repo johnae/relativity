@@ -533,8 +533,8 @@ describe 'Querying', ->
         t = Relativity.table 'users'
         q = Relativity.select!\from t
         q\project Relativity.case!\When(t('age')\lt(18), 'underage')\When(t('age')\gteq(18), 'OK')\Else(Nodes.SqlLiteral.new('NULL'))\End!
-        q\project Relativity.case(t('protection'))\When('private', true)\When('public', false)\End!\as('private')
-        assert.is_like [[
+        q\project Relativity.case(t('projection'))\When('private', true)\When('public', false)\End!\as('private')
+        assert.equal tr[[
           SELECT
           CASE
           WHEN "users"."age" < 18 THEN 'underage'
@@ -542,8 +542,8 @@ describe 'Querying', ->
           ELSE NULL
           END,
           CASE "users"."projection"
-          WHEN 'private' THEN true
-          WHEN 'public' THEN false
+          WHEN 'private' THEN 't'
+          WHEN 'public' THEN 'f'
           END AS "private"
           FROM "users"
         ]], q\to_sql!

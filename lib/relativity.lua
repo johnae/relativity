@@ -4,9 +4,10 @@ local Table = require('relativity.table')
 local SelectManager = require('relativity.select_manager')
 local InsertManager = require('relativity.select_manager')
 local UpdateManager = require('relativity.select_manager')
+local DeleteManager = require('relativity.delete_manager')
 local CaseBuilder = require('relativity.nodes.case_builder')
-local SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null
-SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null = Nodes.SqlLiteral, Nodes.FunctionNode, Nodes.ConstLit, Nodes.UnqualifiedName, Nodes.As, Nodes.Null
+local SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, ArrayAgg, TableAlias
+SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, ArrayAgg, TableAlias = Nodes.SqlLiteral, Nodes.FunctionNode, Nodes.ConstLit, Nodes.UnqualifiedName, Nodes.As, Nodes.Null, Nodes.ArrayAgg, Nodes.TableAlias
 local null = Null.new()
 local star = SqlLiteral.new('*')
 local sql
@@ -16,6 +17,10 @@ end
 local as
 as = function(a, b)
   return As.new(a, UnqualifiedName.new(b))
+end
+local alias
+alias = function(a, b)
+  return TableAlias.new(a, b)
 end
 local func
 func = function(name)
@@ -32,6 +37,7 @@ return {
   null = null,
   star = star,
   as = as,
+  alias = alias,
   func = func,
   range = function(start, finish)
     return Range.new(start, finish)
@@ -56,7 +62,13 @@ return {
   update = function()
     return UpdateManager.new()
   end,
+  delete = function()
+    return DeleteManager.new()
+  end,
   case = function(...)
     return CaseBuilder.new(...)
+  end,
+  array_agg = function(...)
+    return ArrayAgg.new(...)
   end
 }

@@ -148,7 +148,7 @@ SelectManager.join = function(self, relation, klazz)
     return self
   end
   klazz = klazz or Nodes.InnerJoin
-  if relation.is_a[Nodes.SqlLiteral] or type(relation) == 'string' then
+  if type(relation) == 'string' or relation.is_a[Nodes.SqlLiteral] then
     klazz = Nodes.StringJoin
   end
   local r_sources = self.ctx.source.right

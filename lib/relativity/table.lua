@@ -43,6 +43,17 @@ end
 Table.__call = function(self, name)
   return Attribute.new(self, name)
 end
+Table.json = function(self, ...)
+  local opts = { }
+  local _list_0 = {
+    ...
+  }
+  for _index_0 = 1, #_list_0 do
+    local attr = _list_0[_index_0]
+    opts[attr] = self(attr)
+  end
+  return Nodes.JsonBuildObject.new(opts)
+end
 Table.join = function(self, relation, klazz)
   klazz = klazz or Nodes.InnerJoin
   if not (relation) then

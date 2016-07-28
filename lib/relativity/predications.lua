@@ -124,6 +124,9 @@ return {
   ilike = function(self, right)
     return Nodes.ILike.new(self, right)
   end,
+  any = function(self, right)
+    return Nodes.Any.new(self, right)
+  end,
   asc = function(self)
     return Nodes.Ordering.new(self, 'asc')
   end,

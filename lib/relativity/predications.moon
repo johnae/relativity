@@ -113,6 +113,8 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   like: (right) => Nodes.Like.new @, right
   ilike: (right) => Nodes.ILike.new @, right
 
+  any: (right) => Nodes.Any.new @, right
+
   asc: =>
     Nodes.Ordering.new @, 'asc'
 

@@ -36,6 +36,12 @@ Table.alias = (name) =>
 Table.__call = (name) =>
   Attribute.new @, name
 
+Table.json = (...) =>
+  opts = {}
+  for attr in *{...}
+    opts[attr] = @(attr)
+  Nodes.JsonBuildObject.new opts
+
 Table.join = (relation, klazz) =>
   klazz or= Nodes.InnerJoin
   return @from @ unless relation

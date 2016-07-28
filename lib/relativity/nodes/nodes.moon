@@ -37,12 +37,17 @@ With = do
   :ConstLit
 
   Null: Class 'Null', Node
-  
+
   :Join
+  JoinLateral: Class 'JoinLateral', Join
   InnerJoin: Class 'InnerJoin', Join
+  InnerJoinLateral: Class 'InnerJoinLateral', Join
   LeftOuterJoin: Class 'LeftOuterJoin', Join
+  LeftOuterJoinLateral: Class 'LeftOuterJoinLateral', Join
   RightOuterJoin: Class 'RightOuterJoin', Join
+  RightOuterJoinLateral: Class 'RightOuterJoinLateral', Join
   FullOuterJoin: Class 'FullOuterJoin', Join
+  FullOuterJoinLateral: Class 'FullOuterJoinLateral', Join
   StringJoin: Class 'StringJoin', Join
   TableAlias: do
     klazz = Class 'TableAlias', Binary
@@ -66,6 +71,10 @@ With = do
   As: Class 'As', Binary
   Assignment: Class 'Assignment', Binary
   Between: Class 'Between', Binary
+  Any: Class 'Any', Equality
+  ArrayAgg: Class 'ArrayAgg', Unary
+  JsonBuildObject: Class 'JsonBuildObject', Unary
+  ToJson: Class 'ToJson', Unary
   DoesNotMatch: Class 'DoesNotMatch', Binary
   GreaterThan: Class 'GreaterThan', Binary
   GreaterThanOrEqual: Class 'GreaterThanOrEqual', Binary

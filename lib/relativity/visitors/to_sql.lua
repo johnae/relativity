@@ -6,10 +6,10 @@ local Attribute
 Attribute = Attributes.Attribute
 local SelectStatement, In, SqlLiteral
 SelectStatement, In, SqlLiteral = Nodes.SelectStatement, Nodes.In, Nodes.SqlLiteral
-local concat, empty, any
+local concat, empty, any, sort
 do
   local _obj_0 = table
-  concat, empty, any = _obj_0.concat, _obj_0.empty, _obj_0.any
+  concat, empty, any, sort = _obj_0.concat, _obj_0.empty, _obj_0.any, _obj_0.sort
 end
 local ToSql = MultiMethod.new(function(node)
   local node_type = type(node)
@@ -328,6 +328,13 @@ ToSql.InnerJoin = function(self, node)
   end
   return join
 end
+ToSql.InnerJoinLateral = function(self, node)
+  local join = "INNER JOIN LATERAL " .. tostring(self(node.left))
+  if node.right and any(node.right) then
+    join = tostring(join) .. " " .. tostring(self(node.right))
+  end
+  return join
+end
 ToSql.On = function(self, node)
   return "ON " .. tostring(self(node.value))
 end
@@ -414,21 +421,77 @@ ToSql.Equality = function(self, node)
     return tostring(self(node.left)) .. " IS NULL"
   end
 end
+ToSql.Any = function(self, node)
+  local right = node.right
+  return tostring(self(node.left)) .. " = ANY(" .. tostring(self(right)) .. ")"
+end
+ToSql.ToJson = function(self, node)
+  return "to_json(" .. tostring(self(node.value)) .. ")"
+end
+ToSql.ArrayAgg = function(self, node)
+  return "array_agg(" .. tostring(self(node.value)) .. ")"
+end
+ToSql.JsonBuildObject = function(self, node)
+  local json = { }
+  local value = node.value
+  local keys
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    for k, v in pairs(value) do
+      _accum_0[_len_0] = k
+      _len_0 = _len_0 + 1
+    end
+    keys = _accum_0
+  end
+  sort(keys)
+  for _index_0 = 1, #keys do
+    local key = keys[_index_0]
+    json[#json + 1] = "'" .. tostring(key) .. "'::text"
+    json[#json + 1] = tostring(self(value[key]))
+  end
+  return "json_build_object(" .. tostring(concat(json, ', ')) .. ")"
+end
 ToSql.Lock = function(self, node) end
-ToSql.outer_join_type = function(self, node, join_type)
-  return tostring(join_type) .. " OUTER JOIN " .. tostring(self(node.left)) .. " " .. tostring(self(node.right))
+ToSql.outer_join_type = function(self, node, join_type, lateral)
+  if lateral == nil then
+    lateral = false
+  end
+  local join
+  if lateral then
+    join = tostring(join_type) .. " OUTER JOIN LATERAL " .. tostring(self(node.left))
+  else
+    join = tostring(join_type) .. " OUTER JOIN " .. tostring(self(node.left))
+  end
+  if node.right then
+    join = tostring(join) .. " " .. tostring(self(node.right))
+  end
+  return join
 end
 ToSql.LeftOuterJoin = function(self, node)
   return self:outer_join_type(node, 'LEFT')
 end
+ToSql.LeftOuterJoinLateral = function(self, node)
+  return self:outer_join_type(node, 'LEFT', true)
+end
 ToSql.RightOuterJoin = function(self, node)
   return self:outer_join_type(node, 'RIGHT')
+end
+ToSql.RightOuterJoinLateral = function(self, node)
+  return self:outer_join_type(node, 'RIGHT', true)
 end
 ToSql.FullOuterJoin = function(self, node)
   return self:outer_join_type(node, 'FULL')
 end
+ToSql.FullOuterJoinLateral = function(self, node)
+  return self:outer_join_type(node, 'FULL', true)
+end
 ToSql.StringJoin = function(self, node)
-  return self(node.left)
+  local join = self(node.left)
+  if node.right and any(node.right) then
+    join = tostring(join) .. " " .. tostring(self(node.right))
+  end
+  return join
 end
 ToSql.Top = function(self, node)
   return nil
