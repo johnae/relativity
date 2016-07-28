@@ -1,5 +1,5 @@
 require 'relativity.globals'
-{:insert, :empty, :concat} = table
+{:insert, :empty, :concat, :map} = table
 TreeManager = require 'relativity.tree_manager'
 ToSql = require 'relativity.visitors.to_sql'
 Predications = require 'relativity.predications'
@@ -155,7 +155,7 @@ SelectManager.get_taken = =>
 JoinSql = {k, v for k, v in pairs ToSql}
 setmetatable JoinSql, getmetatable(ToSql)
 JoinSql.SelectCore = (node) =>
-  concat @map(node.source.right, (j) -> @ j), ' '
+  concat map(node.source.right, (j) -> @ j), ' '
 
 SelectManager.join_sql = =>
   return unless @ctx.source.right or empty(@ctx.source.right)
@@ -173,7 +173,7 @@ SelectManager.get_order_clauses = =>
 WhereSql = {k, v for k, v in pairs ToSql}
 setmetatable WhereSql, getmetatable(ToSql)
 WhereSql.SelectCore = (node) =>
-  "WHERE #{concat @map(node.wheres, (w) -> @ w), ' AND '}"
+  "WHERE #{concat map(node.wheres, (w) -> @ w), ' AND '}"
 
 SelectManager.where_sql = =>
   return if empty(@ctx.wheres)

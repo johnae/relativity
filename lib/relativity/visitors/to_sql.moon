@@ -4,7 +4,7 @@ Nodes = require 'relativity.nodes.nodes'
 Attributes = require 'relativity.attributes'
 {:Attribute} = Attributes
 {:SelectStatement, :In, :SqlLiteral} = Nodes
-{:concat, :empty, :any, :sort} = table
+{:concat, :empty, :any, :sort, :map} = table
 
 ToSql = MultiMethod.new (node) ->
   node_type = type(node)
@@ -13,11 +13,7 @@ ToSql = MultiMethod.new (node) ->
   else
     node_type
 
-ToSql.all = (list) =>
-  [@ node for node in *list]
-
-ToSql.map = (list, fun) =>
-  [fun(node) for node in *list]
+ToSql.all = (list) => map list, (node) -> @ node
 
 ToSql.DeleteStatement = (node) =>
   d = "DELETE FROM #{@ node.relation}"
@@ -59,13 +55,13 @@ ToSql.UnqualifiedName = (node) =>
 ToSql.InsertStatement = (node) =>
   sql = {"INSERT INTO #{node.relation and @(node.relation) or 'NULL'}"}
   unless empty(node.columns)
-    sql[#sql + 1] = "(#{concat @map(node.columns, (c) -> @quote_column_name c), ', '})"
+    sql[#sql + 1] = "(#{concat map(node.columns, (c) -> @quote_column_name c), ', '})"
   if node.values
     sql[#sql + 1] = @ node.values
   concat sql, ' '
 
 ToSql.Values = (node) =>
-  sql = @map node.expressions, (expr) ->
+  sql = map node.expressions, (expr) ->
     if expr == SqlLiteral
       @ expr
     else
@@ -78,8 +74,8 @@ ToSql.Exist = (node) =>
 ToSql.SelectStatement = (node) =>
   sql = {}
   sql[#sql + 1] = @ node.with if node.with
-  sql[#sql + 1] = concat @map(node.cores, (c) -> @ c), ', '
-  sql[#sql + 1] = "ORDER BY #{concat @map(node.orders, (o) -> @ o), ', '}" unless empty(node.orders)
+  sql[#sql + 1] = concat map(node.cores, (c) -> @ c), ', '
+  sql[#sql + 1] = "ORDER BY #{concat map(node.orders, (o) -> @ o), ', '}" unless empty(node.orders)
   sql[#sql + 1] = @ node.limit if node.limit
   sql[#sql + 1] = @ node.offset if node.offset
   sql[#sql + 1] = @ node.lock if node.lock
@@ -88,10 +84,10 @@ ToSql.SelectStatement = (node) =>
 ToSql.SelectCore = (node) =>
   sql = {"SELECT"}
   sql[#sql + 1] = @ node.top if node.top
-  sql[#sql + 1] = concat @map(node.projections, (p) -> @ p), ', ' unless empty(node.projections)
+  sql[#sql + 1] = concat map(node.projections, (p) -> @ p), ', ' unless empty(node.projections)
   sql[#sql + 1] = @ node.source
-  sql[#sql + 1] = "WHERE #{concat @map(node.wheres, (w) -> @ w), ' AND '}" unless empty(node.wheres)
-  sql[#sql + 1] = "GROUP BY #{concat @map(node.groups, (g) -> @ g), ', '}" unless empty(node.groups)
+  sql[#sql + 1] = "WHERE #{concat map(node.wheres, (w) -> @ w), ' AND '}" unless empty(node.wheres)
+  sql[#sql + 1] = "GROUP BY #{concat map(node.groups, (g) -> @ g), ', '}" unless empty(node.groups)
   sql[#sql + 1] = @ node.having if node.having
   concat sql, ' '
 
@@ -99,7 +95,7 @@ ToSql.JoinSource = (node) =>
   return unless node.left or any(node.right)
   sql = {"FROM"}
   sql[#sql + 1] = @ node.left if node.left
-  sql[#sql + 1] = concat @map(node.right, (j) -> @ j), ' ' unless empty(node.right)
+  sql[#sql + 1] = concat map(node.right, (j) -> @ j), ' ' unless empty(node.right)
   concat sql, ' '
 
 ToSql.Table = (node) =>
@@ -123,7 +119,7 @@ ToSql.quote_column_name = (name) =>
 
 ToSql.Array = (node) =>
   return 'NULL' if empty(node)
-  concat @map(node, (elem) -> @ elem), ', '
+  concat map(node, (elem) -> @ elem), ', '
 
 ToSql.literal = (node) => node
 
@@ -186,7 +182,7 @@ ToSql.Having = (node) =>
   "HAVING #{@ node.value}"
 
 ToSql.And = (node) =>
-  concat @map(node.children, (c) -> @ c), ' AND '
+  concat map(node.children, (c) -> @ c), ' AND '
 
 ToSql.Or = (node) =>
   "#{@ node.left} OR #{@ node.right}"
@@ -295,9 +291,6 @@ ToSql.JsonBuildObject = (node) =>
   for key in *keys
     json[#json + 1] = "'#{key}'::text"
     json[#json + 1] = "#{@ value[key]}"
-  --for k, v in pairs node.value
-  --  json[#json + 1] = "'#{k}'::text"
-  --  json[#json + 1] = "#{@ v}"
   "json_build_object(#{concat json, ', '})"
 
 ToSql.Lock = (node) =>

@@ -6,10 +6,10 @@ local Attribute
 Attribute = Attributes.Attribute
 local SelectStatement, In, SqlLiteral
 SelectStatement, In, SqlLiteral = Nodes.SelectStatement, Nodes.In, Nodes.SqlLiteral
-local concat, empty, any, sort
+local concat, empty, any, sort, map
 do
   local _obj_0 = table
-  concat, empty, any, sort = _obj_0.concat, _obj_0.empty, _obj_0.any, _obj_0.sort
+  concat, empty, any, sort, map = _obj_0.concat, _obj_0.empty, _obj_0.any, _obj_0.sort, _obj_0.map
 end
 local ToSql = MultiMethod.new(function(node)
   local node_type = type(node)
@@ -20,24 +20,9 @@ local ToSql = MultiMethod.new(function(node)
   end
 end)
 ToSql.all = function(self, list)
-  local _accum_0 = { }
-  local _len_0 = 1
-  for _index_0 = 1, #list do
-    local node = list[_index_0]
-    _accum_0[_len_0] = self(node)
-    _len_0 = _len_0 + 1
-  end
-  return _accum_0
-end
-ToSql.map = function(self, list, fun)
-  local _accum_0 = { }
-  local _len_0 = 1
-  for _index_0 = 1, #list do
-    local node = list[_index_0]
-    _accum_0[_len_0] = fun(node)
-    _len_0 = _len_0 + 1
-  end
-  return _accum_0
+  return map(list, function(node)
+    return self(node)
+  end)
 end
 ToSql.DeleteStatement = function(self, node)
   local d = "DELETE FROM " .. tostring(self(node.relation))
@@ -95,7 +80,7 @@ ToSql.InsertStatement = function(self, node)
     "INSERT INTO " .. tostring(node.relation and self(node.relation) or 'NULL')
   }
   if not (empty(node.columns)) then
-    sql[#sql + 1] = "(" .. tostring(concat(self:map(node.columns, function(c)
+    sql[#sql + 1] = "(" .. tostring(concat(map(node.columns, function(c)
       return self:quote_column_name(c)
     end), ', ')) .. ")"
   end
@@ -105,7 +90,7 @@ ToSql.InsertStatement = function(self, node)
   return concat(sql, ' ')
 end
 ToSql.Values = function(self, node)
-  local sql = self:map(node.expressions, function(expr)
+  local sql = map(node.expressions, function(expr)
     if expr == SqlLiteral then
       return self(expr)
     else
@@ -122,11 +107,11 @@ ToSql.SelectStatement = function(self, node)
   if node.with then
     sql[#sql + 1] = self(node.with)
   end
-  sql[#sql + 1] = concat(self:map(node.cores, function(c)
+  sql[#sql + 1] = concat(map(node.cores, function(c)
     return self(c)
   end), ', ')
   if not (empty(node.orders)) then
-    sql[#sql + 1] = "ORDER BY " .. tostring(concat(self:map(node.orders, function(o)
+    sql[#sql + 1] = "ORDER BY " .. tostring(concat(map(node.orders, function(o)
       return self(o)
     end), ', '))
   end
@@ -149,18 +134,18 @@ ToSql.SelectCore = function(self, node)
     sql[#sql + 1] = self(node.top)
   end
   if not (empty(node.projections)) then
-    sql[#sql + 1] = concat(self:map(node.projections, function(p)
+    sql[#sql + 1] = concat(map(node.projections, function(p)
       return self(p)
     end), ', ')
   end
   sql[#sql + 1] = self(node.source)
   if not (empty(node.wheres)) then
-    sql[#sql + 1] = "WHERE " .. tostring(concat(self:map(node.wheres, function(w)
+    sql[#sql + 1] = "WHERE " .. tostring(concat(map(node.wheres, function(w)
       return self(w)
     end), ' AND '))
   end
   if not (empty(node.groups)) then
-    sql[#sql + 1] = "GROUP BY " .. tostring(concat(self:map(node.groups, function(g)
+    sql[#sql + 1] = "GROUP BY " .. tostring(concat(map(node.groups, function(g)
       return self(g)
     end), ', '))
   end
@@ -180,7 +165,7 @@ ToSql.JoinSource = function(self, node)
     sql[#sql + 1] = self(node.left)
   end
   if not (empty(node.right)) then
-    sql[#sql + 1] = concat(self:map(node.right, function(j)
+    sql[#sql + 1] = concat(map(node.right, function(j)
       return self(j)
     end), ' ')
   end
@@ -214,7 +199,7 @@ ToSql.Array = function(self, node)
   if empty(node) then
     return 'NULL'
   end
-  return concat(self:map(node, function(elem)
+  return concat(map(node, function(elem)
     return self(elem)
   end), ', ')
 end
@@ -314,7 +299,7 @@ ToSql.Having = function(self, node)
   return "HAVING " .. tostring(self(node.value))
 end
 ToSql.And = function(self, node)
-  return concat(self:map(node.children, function(c)
+  return concat(map(node.children, function(c)
     return self(c)
   end), ' AND ')
 end

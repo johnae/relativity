@@ -1,8 +1,8 @@
 require('relativity.globals')
-local insert, empty, concat
+local insert, empty, concat, map
 do
   local _obj_0 = table
-  insert, empty, concat = _obj_0.insert, _obj_0.empty, _obj_0.concat
+  insert, empty, concat, map = _obj_0.insert, _obj_0.empty, _obj_0.concat, _obj_0.map
 end
 local TreeManager = require('relativity.tree_manager')
 local ToSql = require('relativity.visitors.to_sql')
@@ -250,7 +250,7 @@ do
 end
 setmetatable(JoinSql, getmetatable(ToSql))
 JoinSql.SelectCore = function(self, node)
-  return concat(self:map(node.source.right, function(j)
+  return concat(map(node.source.right, function(j)
     return self(j)
   end), ' ')
 end
@@ -296,7 +296,7 @@ do
 end
 setmetatable(WhereSql, getmetatable(ToSql))
 WhereSql.SelectCore = function(self, node)
-  return "WHERE " .. tostring(concat(self:map(node.wheres, function(w)
+  return "WHERE " .. tostring(concat(map(node.wheres, function(w)
     return self(w)
   end), ' AND '))
 end
