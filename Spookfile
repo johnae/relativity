@@ -2,6 +2,8 @@
 -- How much logs do we want? (ERR, WARN, INFO, DEBUG)
 log_level "INFO"
 
+clr = os.getenv('LIGHT') and 'black' or 'white'
+
 lint = require("moonscript.cmd.lint").lint_file
 colors = require "ansicolors"
 to_lua = require("moonscript").to_lua
@@ -11,12 +13,12 @@ exec_cmd = command "spook -f"
 lint_cmd = func name: "Lint", handler: (file, newname) ->
   result, err = lint file
   if result
-    io.stdout\write colors("\n[ %{red}LINT error ]\n%{white}#{result}\n\n")
+    io.stdout\write colors("\n[ %{red}LINT error ]\n%{#{clr}}#{result}\n\n")
     return false
   elseif err
-    io.stdout\write colors("\n[ %{red}LINT error ]\n#%{white}{file}\n#{err}\n\n")
+    io.stdout\write colors("\n[ %{red}LINT error ]\n#%{#{clr}}{file}\n#{err}\n\n")
     return false
-  io.stdout\write colors("\n[ %{green}LINT: %{white}All good ]\n\n")
+  io.stdout\write colors("\n[ %{green}LINT: %{#{clr}}All good ]\n\n")
   true
 
 to_lua_cmd = func name: "Compile lua", handler: (newname, ev) ->
@@ -26,15 +28,15 @@ to_lua_cmd = func name: "Compile lua", handler: (newname, ev) ->
   moonfile\close!
   as_lua, line_table = to_lua content
   unless as_lua
-    io.stdout\write colors("\n[ %{red}Compile to lua error in #{changed_file} ]\n%{white}#{line_table}\n\n")
+    io.stdout\write colors("\n[ %{red}Compile to lua error in #{changed_file} ]\n%{#{clr}}#{line_table}\n\n")
     return false
-  io.stdout\write colors("\n[ %{green}Compiled #{changed_file} to lua file #{newname}: %{white}All good ]\n\n")
+  io.stdout\write colors("\n[ %{green}Compiled #{changed_file} to lua file #{newname}: %{#{clr}}All good ]\n\n")
   lua_file = io.open(newname, 'w+')
   if lua_file
     lua_file\write as_lua
     lua_file\close!
   else
-    io.stdout\write colors("\n[ %{red}Compile to lua error ]\n%{white}Couldn't write to '#{newname}'\n\n")
+    io.stdout\write colors("\n[ %{red}Compile to lua error ]\n%{#{clr}}Couldn't write to '#{newname}'\n\n")
   true
 
 -- Directories to watch for changes, how to map detected changes to
