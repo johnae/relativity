@@ -34,6 +34,7 @@ to_lua_cmd = func name: "Compile lua", handler: (newname, ev) ->
   lua_file = io.open(newname, 'w+')
   if lua_file
     lua_file\write as_lua
+    lua_file\write "\n"
     lua_file\close!
   else
     io.stdout\write colors("\n[ %{red}Compile to lua error ]\n%{#{clr}}Couldn't write to '#{newname}'\n\n")
