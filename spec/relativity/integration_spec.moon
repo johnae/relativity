@@ -28,7 +28,7 @@ describe 'Relativity', ->
 
     it 'performs an inner join', ->
       photos = Relativity.table 'photos'
-      q = users\join(photos)\on(users'id'\eq(photos'user_id'))
+      q = users\join(photos)\on users'id'\eq photos'user_id'
       q = q\project Relativity.star
       assert.equal tr[[
         SELECT *
