@@ -113,7 +113,7 @@ Multiple arguments can be given too:
 OR works like this:
 
 ```moonscript
-    users\where users'name'\eq'linus'\or(users'age'\lt25)
+    users\where users'name'\eq'linus'\or(users'age'\lt 25)
 ```
 
 AS works in a similar fashion.
