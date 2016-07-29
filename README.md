@@ -27,9 +27,11 @@ tests run on LuaJIT. The reason is that I'm only interested in LuaJIT (and OpenR
 
 ## Usage
 
+See spec/relativity/integration_spec.moon for more examples.
+
 ```moonscript
     users = Relativity.table 'users'
-    users\project(Relativity.star).to_sql!
+    users\project(Relativity.star)\to_sql!
 ```
 
 Generates
@@ -40,12 +42,13 @@ Generates
 
 ### More advanced queries
 ```moonscript
-    users\where(users('name')\eq('ricky'))
+    users\where(users('name')\eq('Einstein'))\to_sql!
 ```
 
 Generates
 ```sql
-    SELECT * FROM "users" WHERE "users"."name" = 'ricky'
+    SELECT * FROM "users"
+    WHERE "users"."name" = 'Einstein'
 ```
 
 The selection in SQL contains what you want from the database, this is called
