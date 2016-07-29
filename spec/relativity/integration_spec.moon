@@ -88,15 +88,19 @@ describe 'Relativity', ->
       json_select = Relativity.select!
       json_select\project Relativity.as Relativity.array_agg(others\json 'id', 'name'), "list"
       json_select = Relativity.alias json_select, 'things'
+      things = Relativity.as Nodes.ToJson.new(Relativity.table'things''list'), 'things'
+      users_star = Nodes.TableStar.new users
 
-      u = users\project Nodes.TableStar.new(users), Relativity.as(Nodes.ToJson.new(Relativity.table("things")("list")), "things")
+      u = users\project users_star, things
       u\join(json_select, Nodes.InnerJoinLateral)\on(true)
+      u\where users'name'\like '%berg%'
 
       assert.equal tr[[
         SELECT "users".*, to_json("things"."list") AS "things"
         FROM "users"
         INNER JOIN LATERAL
         (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list") "things" ON 't'
+        WHERE "users"."name" LIKE '%berg%'
       ]], u\to_sql!
 
     it 'coalesce takes a value and a default', ->
