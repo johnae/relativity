@@ -150,7 +150,9 @@ u\where users'name'\like '%berg%'
 Generates (via calling \to_sql! on the relation of course):
 
 ```SQL
-SELECT "users".*, COALESCE("users"."employer", 'none') AS "employer", to_json("things"."list") AS "things"
+SELECT "users".*,
+       COALESCE("users"."employer", 'none') AS "employer",
+       to_json("things"."list") AS "things"
 FROM "users"
 INNER JOIN LATERAL (
   SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list"
