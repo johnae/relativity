@@ -135,8 +135,10 @@ json_select = Relativity.alias json_select, 'things'
 
 things = Relativity.as Nodes.ToJson.new(Relativity.table'things''list'), 'things'
 users_star = Nodes.TableStar.new users
+coalesce = Relativity.func "coalesce"
+user_employer = coalesce(users'employer', 'none')\as 'employer'
 
-u = users\project users_star, things
+u = users\project users_star, user_employer, things
 u\join(json_select, Nodes.InnerJoinLateral)\on true
 u\where users'name'\like '%berg%'
 ```
@@ -144,7 +146,7 @@ u\where users'name'\like '%berg%'
 Generates (via calling \to_sql! on the relation of course):
 
 ```SQL
-SELECT "users".*, to_json("things"."list") AS "things"
+SELECT "users".*, coalesce("users"."employer", 'none') AS "employer", to_json("things"."list") AS "things"
 FROM "users"
 INNER JOIN LATERAL (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list") "things" ON 't'
 WHERE "users"."name" LIKE '%berg%'
