@@ -154,7 +154,8 @@ SELECT "users".*, COALESCE("users"."employer", 'none') AS "employer", to_json("t
 FROM "users"
 INNER JOIN LATERAL (
   SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list"
-  FROM "others" WHERE "others"."id" = ANY("users"."things")
+  FROM "others"
+  WHERE "others"."id" = ANY("users"."things")
 ) "things" ON 't'
 WHERE "users"."name" LIKE '%berg%'
 ```
