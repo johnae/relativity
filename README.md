@@ -100,7 +100,7 @@ All operators are chainable:
 ```
 
 ```moonscript
-    users\where(users'name'\eq'linus')\where(users'age'\lt 25)
+    users\where(users'name'\eq'linus')\where users'age'\lt 25
 ```
 
 Multiple arguments can be given too:
