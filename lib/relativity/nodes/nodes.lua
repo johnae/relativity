@@ -73,7 +73,6 @@ return {
   As = Class('As', Binary),
   Assignment = Class('Assignment', Binary),
   Between = Class('Between', Binary),
-  Any = Class('Any', Equality),
   ArrayAgg = Class('ArrayAgg', Unary),
   JsonBuildObject = Class('JsonBuildObject', Unary),
   ToJson = Class('ToJson', Unary),

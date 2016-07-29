@@ -85,12 +85,17 @@ describe 'Relativity', ->
 
       others = Relativity.table 'others'
 
+      any = Relativity.func "ANY"
+      coalesce = Relativity.func "COALESCE"
+
       json_select = Relativity.select!
+      json_select\from others
       json_select\project Relativity.as Relativity.array_agg(others\json 'id', 'name'), "list"
+      json_select\where others'id'\eq any users'things'
       json_select = Relativity.alias json_select, 'things'
+
       things = Relativity.as Nodes.ToJson.new(Relativity.table'things''list'), 'things'
       users_star = Nodes.TableStar.new users
-      coalesce = Relativity.func "coalesce"
       user_employer = coalesce(users'employer', 'none')\as 'employer'
 
       u = users\project users_star, user_employer, things
@@ -98,9 +103,10 @@ describe 'Relativity', ->
       u\where users'name'\like '%berg%'
 
       assert.equal tr[[
-        SELECT "users".*, coalesce("users"."employer", 'none') AS "employer", to_json("things"."list") AS "things"
+        SELECT "users".*, COALESCE("users"."employer", 'none') AS "employer", to_json("things"."list") AS "things"
         FROM "users"
         INNER JOIN LATERAL
-        (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list") "things" ON 't'
+        (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list"
+        FROM "others" WHERE "others"."id" = ANY("users"."things")) "things" ON 't'
         WHERE "users"."name" LIKE '%berg%'
       ]], u\to_sql!

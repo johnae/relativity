@@ -272,10 +272,6 @@ ToSql.Equality = (node) =>
   else
     "#{@ node.left} IS NULL"
 
-ToSql.Any = (node) =>
-  right = node.right
-  "#{@ node.left} = ANY(#{@ right})"
-
 ToSql.ToJson = (node) =>
   "to_json(#{@ node.value})"
 

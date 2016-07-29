@@ -406,10 +406,6 @@ ToSql.Equality = function(self, node)
     return tostring(self(node.left)) .. " IS NULL"
   end
 end
-ToSql.Any = function(self, node)
-  local right = node.right
-  return tostring(self(node.left)) .. " = ANY(" .. tostring(self(right)) .. ")"
-end
 ToSql.ToJson = function(self, node)
   return "to_json(" .. tostring(self(node.value)) .. ")"
 end
