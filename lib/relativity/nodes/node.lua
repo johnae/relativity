@@ -22,11 +22,17 @@ end
 Node.Or = function(self, right)
   return Grouping.new(Or.new(self, right))
 end
+Node.__add = function(self, right)
+  return self:Or(right)
+end
 Node.And = function(self, right)
   return And.new({
     self,
     right
   })
+end
+Node.__mul = function(self, right)
+  return self:And(right)
 end
 Node.to_sql = function(self)
   return ToSql(self)

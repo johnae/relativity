@@ -64,8 +64,7 @@ Joins look like this:
     -- => SELECT * FROM "users" INNER JOIN "photos" ON "users"."id" = "photos"."user_id"
 ```
 
-Note that some of the above is taking advantage of MoonScript/Lua allowing to skip the parentheses
-in certain instances. Eg. this:
+Note that some of the above is taking advantage of MoonScript/Lua allowing to skip the parentheses in certain instances. Eg. this:
 
 ```moonscript
 users'id'\eq photos'user_id'
@@ -107,7 +106,7 @@ All operators are chainable:
 Multiple arguments can be given too:
 
 ```moonscript
-    users\where(users'name'\eq'linus', users'age'\lt 25)
+    users\where users'name'\eq'linus', users'age'\lt 25
 ```
 
 OR works like this:
@@ -116,10 +115,21 @@ OR works like this:
     users\where users'name'\eq'linus'\Or users'age'\lt 25
 ```
 
-Unfortunately 'or' is a reserved keyword in MoonScript/Lua and cannot be used. For now I've resorted to title case
-for these. It's ugly i.m.o. I'd like to come up with an alternative.
+Unfortunately 'or' is a reserved keyword in MoonScript/Lua and cannot be used. For now I've resorted to title case for these. It's ugly i.m.o. Therefore I've (for now) also added LPeg:ish operators. If you don't know LPeg, you can read more about it here: http://www.inf.puc-rio.br/~roberto/lpeg/.
 
-AS works in a similar fashion, but is lowercased since it isn't reserved.
+So OR can also be written like this:
+
+```moonscript
+    users\where users'name'\eq'linus' + users'age'\lt 25
+```
+
+AS works in a similar fashion, but is lowercased since it isn't reserved. AND has the same problem as OR and must be written in title case or, as above, using an LPeg:ish operator - like this:
+
+```moonscript
+    users\where users'name'\eq'linus' * users'age'\lt 25
+```
+
+And is less often used since it's assumed in a where.
 
 
 Since I mostly care about Postgres, more advanced queries (Postgres specific) are possible, such as:

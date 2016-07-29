@@ -9,6 +9,8 @@ And = defer -> require("relativity.nodes.nodes").And
 Node = Class "Node"
 Node.Not = => Not.new @
 Node.Or = (right) => Grouping.new Or.new(@, right)
+Node.__add = (right) => @Or right
 Node.And = (right) => And.new {@, right}
+Node.__mul = (right) => @And right
 Node.to_sql = => ToSql @
 Node

@@ -63,10 +63,18 @@ describe 'Relativity', ->
       ]], q\to_sql!
 
     it 'selects users where either condition is true', ->
+      q = users\where users'name'\eq'bob'\Or users'age'\lt 25
       assert.equal tr[[
         SELECT FROM "users"
         WHERE ("users"."name" = 'bob' OR "users"."age" < 25)
-      ]], users\where(users'name'\eq'bob'\Or users'age'\lt 25)\to_sql!
+      ]], q\to_sql!
+
+    it 'selects users where either condition is true using lpeg:ish syntax', ->
+      q = users\where users'name'\eq'bob' + users'age'\lt 25
+      assert.equal tr[[
+        SELECT FROM "users"
+        WHERE ("users"."name" = 'bob' OR "users"."age" < 25)
+      ]], q\to_sql!
 
   describe 'advanced postgres queries', ->
 
