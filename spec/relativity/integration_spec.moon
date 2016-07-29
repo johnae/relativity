@@ -29,9 +29,9 @@ describe 'Relativity', ->
     it 'performs an inner join', ->
       photos = Relativity.table 'photos'
       q = users\join(photos)\on users'id'\eq photos'user_id'
-      q = q\project Relativity.star
+      q = q\project users.star
       assert.equal tr[[
-        SELECT *
+        SELECT "users".*
         FROM "users"
         INNER JOIN "photos" ON "users"."id" = "photos"."user_id"
       ]], q\to_sql!
@@ -103,10 +103,9 @@ describe 'Relativity', ->
       json_select = Relativity.alias json_select, 'things'
 
       things = Relativity.as Nodes.ToJson.new(Relativity.table'things''list'), 'things'
-      users_star = Nodes.TableStar.new users
       user_employer = coalesce(users'employer', 'none')\as 'employer'
 
-      u = users\project users_star, user_employer, things
+      u = users\project users.star, user_employer, things
       u\join(json_select, Nodes.InnerJoinLateral)\on(true)
       u\where users'name'\like '%berg%'
 

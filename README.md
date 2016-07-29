@@ -150,10 +150,9 @@ json_select\where others'id'\eq any users'things'
 json_select = Relativity.alias json_select, 'things'
 
 things = Relativity.as Nodes.ToJson.new(Relativity.table'things''list'), 'things'
-users_star = Nodes.TableStar.new users
 user_employer = coalesce(users'employer', 'none')\as 'employer'
 
-u = users\project users_star, user_employer, things
+u = users\project users.star, user_employer, things
 u\join(json_select, Nodes.InnerJoinLateral)\on true
 u\where users'name'\like '%berg%'
 ```

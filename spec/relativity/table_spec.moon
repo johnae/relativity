@@ -100,4 +100,4 @@ describe 'Table', ->
     assert.equal 'id', column.name
 
   it '#star returns table.*', ->
-    assert.equal 'SELECT "users".* FROM "users"', table\project(table\star!)\to_sql!
+    assert.equal 'SELECT "users".* FROM "users"', table\project(table.star)\to_sql!

@@ -77,7 +77,6 @@ Table.take = (amount) =>
 Table.where = (condition) =>
   @from(@)\where condition
 
-Table.star = =>
-  Nodes.TableStar.new @
+Table.get_star = => Nodes.TableStar.new @
 
 Table
