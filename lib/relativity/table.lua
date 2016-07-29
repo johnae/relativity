@@ -90,7 +90,7 @@ end
 Table.where = function(self, condition)
   return self:from(self):where(condition)
 end
-Table.star = function(self)
+Table.get_star = function(self)
   return Nodes.TableStar.new(self)
 end
 return Table

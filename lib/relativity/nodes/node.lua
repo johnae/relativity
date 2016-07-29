@@ -19,6 +19,9 @@ local Node = Class("Node")
 Node.Not = function(self)
   return Not.new(self)
 end
+Node.__unm = function(self, right)
+  return self:Not()
+end
 Node.Or = function(self, right)
   return Grouping.new(Or.new(self, right))
 end

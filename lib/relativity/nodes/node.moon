@@ -8,6 +8,7 @@ And = defer -> require("relativity.nodes.nodes").And
 
 Node = Class "Node"
 Node.Not = => Not.new @
+Node.__unm = (right) => @Not!
 Node.Or = (right) => Grouping.new Or.new(@, right)
 Node.__add = (right) => @Or right
 Node.And = (right) => And.new {@, right}

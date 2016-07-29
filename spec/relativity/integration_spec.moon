@@ -76,6 +76,20 @@ describe 'Relativity', ->
         WHERE ("users"."name" = 'bob' OR "users"."age" < 25)
       ]], q\to_sql!
 
+    it 'selects users where a condition is not true', ->
+      q = users\where users'id'\eq(10)\Not!
+      assert.equal tr[[
+        SELECT FROM "users"
+        WHERE NOT ("users"."id" = 10)
+      ]], q\to_sql!
+
+    it 'selects users where a condition is not true using lpeg:ish syntax', ->
+      q = users\where -users'id'\eq 10
+      assert.equal tr[[
+        SELECT FROM "users"
+        WHERE NOT ("users"."id" = 10)
+      ]], q\to_sql!
+
   describe 'advanced postgres queries', ->
 
     it 'selecting json objects', ->

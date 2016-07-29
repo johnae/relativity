@@ -131,6 +131,27 @@ AS works in a similar fashion, but is lowercased since it isn't reserved. AND ha
 
 And is less often used since it's assumed in a where.
 
+There's also Not which is a reserved keyword. For now both of the below do the same thing.
+
+Using title case:
+
+```moonscript
+users\where users'id'\eq(10)\Not!
+```
+
+Or lpeg:ish
+
+```moonscript
+users\where -users'id'\eq 10
+```
+
+Both generate this:
+
+```SQL
+SELECT FROM "users"
+WHERE NOT ("users"."id" = 10)
+```
+
 
 Since I mostly care about Postgres, more advanced queries (Postgres specific) are possible, such as:
 
