@@ -118,6 +118,31 @@ OR works like this:
 
 AS works in a similar fashion.
 
+Since I mostly care about Postgres, more advanced queries (Postgres specific) are possible, such as:
+
+```moonscript
+Nodes = require 'relativity.nodes.nodes'
+users = Relativity.table 'users'
+others = Relativity.table 'others'
+json_select = Relativity.select!
+
+json_select\project Relativity.as Relativity.array_agg(others\json 'id', 'name'), 'list'
+json_select = Relativity.alias json_select, 'things'
+
+u = users\project Nodes.TableStar.new(users), Relativity.as(Nodes.ToJson.new(Relativity.table'things'('list')), 'things')
+u\join(json_select, Nodes.InnerJoinLateral)\on true
+```
+
+Generates:
+
+```SQL
+SELECT "users".*, to_json("things"."list") AS "things"
+FROM "users"
+INNER JOIN LATERAL (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list") "things" ON 't'
+```
+
+I'd like to extend this even further for supporting most of the advanced Postgres functionality.
+
 ## Development
 
 Running the tests requires busted https://github.com/Olivine-Labs/busted and luassert https://github.com/Olivine-Labs/luassert.

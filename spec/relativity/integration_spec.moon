@@ -86,7 +86,7 @@ describe 'Relativity', ->
       others = Relativity.table 'others'
 
       json_select = Relativity.select!
-      json_select\project Relativity.as Relativity.array_agg(others\json('id', 'name')), "list"
+      json_select\project Relativity.as Relativity.array_agg(others\json 'id', 'name'), "list"
       json_select = Relativity.alias json_select, 'things'
 
       u = users\project Nodes.TableStar.new(users), Relativity.as(Nodes.ToJson.new(Relativity.table("things")("list")), "things")
