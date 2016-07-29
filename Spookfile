@@ -47,6 +47,10 @@ watch "lib", "spec", ->
   on_changed "^spec/(.*)_spec%.moon", (a) ->
     lint_cmd("spec/#{a}_spec.moon") +
     spec_cmd("spec/#{a}_spec.moon")
+  on_changed "^lib/relativity%.moon", (a) ->
+    lint_cmd("lib/relativity.moon") +
+    spec_cmd("spec/") +
+    to_lua_cmd("lib/relativity.lua")
   on_changed "^lib/(.*)%.moon", (a) ->
     lint_cmd("lib/#{a}.moon") +
     spec_cmd("spec/#{a}_spec.moon") +
