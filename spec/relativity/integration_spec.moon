@@ -66,7 +66,7 @@ describe 'Relativity', ->
       assert.equal tr[[
         SELECT FROM "users"
         WHERE ("users"."name" = 'bob' OR "users"."age" < 25)
-      ]], users\where(users('name')\eq('bob')\Or(users('age')\lt(25)))\to_sql!
+      ]], users\where(users'name'\eq'bob'\Or users'age'\lt 25)\to_sql!
 
   describe 'advanced postgres queries', ->
 

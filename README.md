@@ -113,10 +113,14 @@ Multiple arguments can be given too:
 OR works like this:
 
 ```moonscript
-    users\where users'name'\eq'linus'\or(users'age'\lt 25)
+    users\where users'name'\eq'linus'\Or users'age'\lt 25
 ```
 
-AS works in a similar fashion.
+Unfortunately 'or' is a reserved keyword in MoonScript/Lua and cannot be used. For now I've resorted to title case
+for these. It's ugly i.m.o. I'd like to come up with an alternative.
+
+AS works in a similar fashion, but is lowercased since it isn't reserved.
+
 
 Since I mostly care about Postgres, more advanced queries (Postgres specific) are possible, such as:
 
