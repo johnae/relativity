@@ -135,7 +135,8 @@ And is less often used since it's assumed in a where.
 Since I mostly care about Postgres, more advanced queries (Postgres specific) are possible, such as:
 
 ```moonscript
-Nodes = require 'relativity.nodes.nodes'
+Relativity = require 'relativity'
+Nodes = Relativity.Nodes
 users = Relativity.table 'users'
 others = Relativity.table 'others'
 

@@ -1,7 +1,7 @@
 SelectManager = require 'relativity.select_manager'
 Table = require 'relativity.table'
-Nodes = require 'relativity.nodes.nodes'
 Relativity = require 'relativity'
+Nodes = Relativity.Nodes
 
 describe 'Querying', ->
   describe 'SelectManager', ->

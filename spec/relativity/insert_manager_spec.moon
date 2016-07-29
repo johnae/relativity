@@ -1,7 +1,7 @@
-Table = require 'relativity.table'
 InsertManager = require 'relativity.insert_manager'
 Relativity = require 'relativity'
-Nodes = require 'relativity.nodes.nodes'
+Nodes = Relativity.Nodes
+Table = Relativity.Table
 
 describe 'InsertManager', ->
   local im, users

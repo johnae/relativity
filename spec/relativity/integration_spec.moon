@@ -1,7 +1,7 @@
 -- This file doubles as spec and playground for some specific postgres functionality
 
 Relativity = require 'relativity'
-Nodes = require 'relativity.nodes.nodes'
+Nodes = Relativity.Nodes
 
 describe 'Relativity', ->
   local users

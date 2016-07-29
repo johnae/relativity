@@ -1,7 +1,7 @@
-Nodes = require 'relativity.nodes.nodes'
 UpdateManager = require 'relativity.update_manager'
 Table = require 'relativity.table'
 Relativity = require 'relativity'
+Nodes = Relativity.Nodes
 
 describe 'UpdateManager', ->
   local users, um
