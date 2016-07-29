@@ -67,7 +67,6 @@ With = do
   Max: Class 'Max', FunctionNode
   Min: Class 'Min', FunctionNode
   Avg: Class 'Avg', FunctionNode
-  Coalesce: Class 'Coalesce', Binary
 
   As: Class 'As', Binary
   Assignment: Class 'Assignment', Binary

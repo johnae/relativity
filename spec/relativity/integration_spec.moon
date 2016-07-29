@@ -102,9 +102,3 @@ describe 'Relativity', ->
         (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list") "things" ON 't'
         WHERE "users"."name" LIKE '%berg%'
       ]], u\to_sql!
-
-    it 'coalesce takes a value and a default', ->
-      coalesce = Nodes.Coalesce.new users('id'), false
-      assert.equal tr[[
-        COALESCE("users"."id", 'f')
-      ]], coalesce\to_sql!
