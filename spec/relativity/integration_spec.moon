@@ -8,20 +8,65 @@ describe 'Relativity', ->
   before_each ->
     users = Relativity.table 'users'
 
-  it 'performs a users find', ->
-    assert.equal tr[[
-      SELECT FROM "users"
-      WHERE "users"."name" = 'Einstein'
-    ]], users\where(users('name')\eq('Einstein'))\to_sql!
+  describe 'README examples', ->
 
-  it 'selects all from users', ->
-    assert.equal 'SELECT * FROM "users"', users\project(Relativity.star)\to_sql!
+    it 'selects id from users', ->
+      q = users\project users'id'
+      assert.equal 'SELECT "users"."id" FROM "users"', q\to_sql!
 
-  it 'selects users where either condition is true', ->
-    assert.equal tr[[
-      SELECT FROM "users"
-      WHERE ("users"."name" = 'bob' OR "users"."age" < 25)
-    ]], users\where(users('name')\eq('bob')\Or(users('age')\lt(25)))\to_sql!
+    it 'selects all from users', ->
+      q = users\project Relativity.star
+      assert.equal 'SELECT * FROM "users"', q\to_sql!
+
+    it 'performs a users find with restriction', ->
+      q = users\where users'name'\eq'Einstein'
+      q = q\project Relativity.star
+      assert.equal tr[[
+        SELECT * FROM "users"
+        WHERE "users"."name" = 'Einstein'
+      ]], q\to_sql!
+
+    it 'performs an inner join', ->
+      photos = Relativity.table 'photos'
+      q = users\join(photos)\on(users'id'\eq(photos'user_id'))
+      q = q\project Relativity.star
+      assert.equal tr[[
+        SELECT *
+        FROM "users"
+        INNER JOIN "photos" ON "users"."id" = "photos"."user_id"
+      ]], q\to_sql!
+
+    it 'performs a limit', ->
+      q = users\take 5
+      q\project Relativity.star
+      assert.equal tr[[
+        SELECT *
+        FROM "users"
+        LIMIT 5
+      ]], q\to_sql!
+
+    it 'performs an offset', ->
+      q = users\skip 4
+      q\project Relativity.star
+      assert.equal tr[[
+        SELECT *
+        FROM "users"
+        OFFSET 4
+      ]], q\to_sql!
+
+    it 'performs a GROUP BY', ->
+      q = users\group(users'name')\project Relativity.star
+      assert.equal tr[[
+        SELECT *
+        FROM "users"
+        GROUP BY "users"."name"
+      ]], q\to_sql!
+
+    it 'selects users where either condition is true', ->
+      assert.equal tr[[
+        SELECT FROM "users"
+        WHERE ("users"."name" = 'bob' OR "users"."age" < 25)
+      ]], users\where(users('name')\eq('bob')\Or(users('age')\lt(25)))\to_sql!
 
   describe 'advanced postgres queries', ->
 
@@ -53,3 +98,9 @@ describe 'Relativity', ->
         INNER JOIN LATERAL
         (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list") "things" ON 't'
       ]], u\to_sql!
+
+    it 'coalesce takes a value and a default', ->
+      coalesce = Nodes.Coalesce.new users('id'), false
+      assert.equal tr[[
+        COALESCE("users"."id", 'f')
+      ]], coalesce\to_sql!

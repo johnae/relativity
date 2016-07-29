@@ -337,6 +337,9 @@ ToSql.Grouping = (node) =>
 ToSql.FunctionNode = (node) =>
   "#{@ node.alias}(#{concat [@(x) for x in *node.expressions], ', '})"
 
+ToSql.Coalesce = (node) =>
+  "COALESCE(#{@ node.left}, #{@ node.right})"
+
 ToSql.Case = (node) =>
   sql = {'CASE'}
   sql[#sql + 1] = @ node._base if node._base

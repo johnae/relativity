@@ -500,6 +500,9 @@ ToSql.FunctionNode = function(self, node)
     return _accum_0
   end)(), ', ')) .. ")"
 end
+ToSql.Coalesce = function(self, node)
+  return "COALESCE(" .. tostring(self(node.left)) .. ", " .. tostring(self(node.right)) .. ")"
+end
 ToSql.Case = function(self, node)
   local sql = {
     'CASE'
