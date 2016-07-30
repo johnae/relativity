@@ -169,7 +169,8 @@ to_json = Relativity.func 'to_json'
 
 json_select = Relativity.select!
 json_select\from others
-json_select\project array_agg(json_build_object 'id', others'id', 'name', others'name')\as 'list'
+json_object = json_build_object 'id', others'id', 'name', others'name'
+json_select\project array_agg(json_object)\as 'list'
 json_select\where others'id'\eq any users'things'
 json_select = Relativity.alias json_select, 'things'
 
