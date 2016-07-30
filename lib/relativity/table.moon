@@ -39,7 +39,7 @@ Table.__call = (name) =>
 Table.json = (...) =>
   opts = {}
   for attr in *{...}
-    opts[attr] = @(attr)
+    opts[attr] = @ attr
   Nodes.JsonBuildObject.new opts
 
 Table.join = (relation, klazz) =>

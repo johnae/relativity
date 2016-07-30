@@ -272,12 +272,6 @@ ToSql.Equality = (node) =>
   else
     "#{@ node.left} IS NULL"
 
-ToSql.ToJson = (node) =>
-  "to_json(#{@ node.value})"
-
-ToSql.ArrayAgg = (node) =>
-  "array_agg(#{@ node.value})"
-
 ToSql.JsonBuildObject = (node) =>
   json = {}
   value = node.value

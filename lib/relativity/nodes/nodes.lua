@@ -30,6 +30,27 @@ do
   end
   With = klazz
 end
+local UnqualifiedName
+do
+  local klazz = Class('UnqualifiedName', Unary)
+  klazz.get_attribute = function(self)
+    return self.value
+  end
+  klazz.set_attribute = function(self, attr)
+    self.value = attr
+  end
+  klazz.get_relation = function(self)
+    return self.value.relation
+  end
+  klazz.get_column = function(self)
+    return self.value.column
+  end
+  klazz.get_name = function(self)
+    return self.value
+  end
+  UnqualifiedName = klazz
+end
+local As = Class('As', Binary)
 return {
   SelectStatement = SelectStatement,
   InsertStatement = InsertStatement,
@@ -70,12 +91,16 @@ return {
   Max = Class('Max', FunctionNode),
   Min = Class('Min', FunctionNode),
   Avg = Class('Avg', FunctionNode),
-  As = Class('As', Binary),
+  As = As,
   Assignment = Class('Assignment', Binary),
   Between = Class('Between', Binary),
-  ArrayAgg = Class('ArrayAgg', Unary),
-  JsonBuildObject = Class('JsonBuildObject', Unary),
-  ToJson = Class('ToJson', Unary),
+  JsonBuildObject = (function()
+    local klazz = Class('JsonBuildObject', Unary)
+    klazz.as = function(self, other)
+      return As.new(self, UnqualifiedName.new(other))
+    end
+    return klazz
+  end)(),
   DoesNotMatch = Class('DoesNotMatch', Binary),
   GreaterThan = Class('GreaterThan', Binary),
   GreaterThanOrEqual = Class('GreaterThanOrEqual', Binary),
@@ -124,23 +149,5 @@ return {
     end
     return klazz
   end)(),
-  UnqualifiedName = (function()
-    local klazz = Class('UnqualifiedName', Unary)
-    klazz.get_attribute = function(self)
-      return self.value
-    end
-    klazz.set_attribute = function(self, attr)
-      self.value = attr
-    end
-    klazz.get_relation = function(self)
-      return self.value.relation
-    end
-    klazz.get_column = function(self)
-      return self.value.column
-    end
-    klazz.get_name = function(self)
-      return self.value
-    end
-    return klazz
-  end)()
+  UnqualifiedName = UnqualifiedName
 }

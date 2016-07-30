@@ -406,12 +406,6 @@ ToSql.Equality = function(self, node)
     return tostring(self(node.left)) .. " IS NULL"
   end
 end
-ToSql.ToJson = function(self, node)
-  return "to_json(" .. tostring(self(node.value)) .. ")"
-end
-ToSql.ArrayAgg = function(self, node)
-  return "array_agg(" .. tostring(self(node.value)) .. ")"
-end
 ToSql.JsonBuildObject = function(self, node)
   local json = { }
   local value = node.value

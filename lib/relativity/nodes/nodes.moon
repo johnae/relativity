@@ -27,6 +27,20 @@ With = do
     @children = expr
   klazz
 
+UnqualifiedName = do
+  klazz = Class 'UnqualifiedName', Unary
+  klazz.get_attribute =  => @value
+  klazz.set_attribute = (attr) => @value = attr
+  klazz.get_relation = =>
+    @value.relation
+  klazz.get_column = =>
+    @value.column
+  klazz.get_name = =>
+    @value
+  klazz
+
+As = Class 'As', Binary
+
 {
   :SelectStatement
   :InsertStatement
@@ -68,12 +82,15 @@ With = do
   Min: Class 'Min', FunctionNode
   Avg: Class 'Avg', FunctionNode
 
-  As: Class 'As', Binary
+  :As
   Assignment: Class 'Assignment', Binary
   Between: Class 'Between', Binary
-  ArrayAgg: Class 'ArrayAgg', Unary
-  JsonBuildObject: Class 'JsonBuildObject', Unary
-  ToJson: Class 'ToJson', Unary
+  JsonBuildObject: do
+    klazz = Class 'JsonBuildObject', Unary
+    klazz.as = (other) =>
+      As.new @, UnqualifiedName.new(other)
+    klazz
+
   DoesNotMatch: Class 'DoesNotMatch', Binary
   GreaterThan: Class 'GreaterThan', Binary
   GreaterThanOrEqual: Class 'GreaterThanOrEqual', Binary
@@ -121,15 +138,6 @@ With = do
       @right
     klazz
 
-  UnqualifiedName: do
-    klazz = Class 'UnqualifiedName', Unary
-    klazz.get_attribute =  => @value
-    klazz.set_attribute = (attr) => @value = attr
-    klazz.get_relation = =>
-      @value.relation
-    klazz.get_column = =>
-      @value.column
-    klazz.get_name = =>
-      @value
-    klazz
+  :UnqualifiedName
+
 }
