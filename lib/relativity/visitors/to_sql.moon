@@ -272,17 +272,6 @@ ToSql.Equality = (node) =>
   else
     "#{@ node.left} IS NULL"
 
-ToSql.JsonBuildObject = (node) =>
-  json = {}
-  value = node.value
-  -- sorting them to get the same ordering every time
-  keys = [k for k,v in pairs value]
-  sort keys
-  for key in *keys
-    json[#json + 1] = "'#{key}'::text"
-    json[#json + 1] = "#{@ value[key]}"
-  "json_build_object(#{concat json, ', '})"
-
 ToSql.Lock = (node) =>
 
 ToSql.outer_join_type = (node, join_type, lateral=false) =>

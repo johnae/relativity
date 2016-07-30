@@ -94,13 +94,6 @@ return {
   As = As,
   Assignment = Class('Assignment', Binary),
   Between = Class('Between', Binary),
-  JsonBuildObject = (function()
-    local klazz = Class('JsonBuildObject', Unary)
-    klazz.as = function(self, other)
-      return As.new(self, UnqualifiedName.new(other))
-    end
-    return klazz
-  end)(),
   DoesNotMatch = Class('DoesNotMatch', Binary),
   GreaterThan = Class('GreaterThan', Binary),
   GreaterThanOrEqual = Class('GreaterThanOrEqual', Binary),

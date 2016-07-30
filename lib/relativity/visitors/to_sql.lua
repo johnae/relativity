@@ -406,27 +406,6 @@ ToSql.Equality = function(self, node)
     return tostring(self(node.left)) .. " IS NULL"
   end
 end
-ToSql.JsonBuildObject = function(self, node)
-  local json = { }
-  local value = node.value
-  local keys
-  do
-    local _accum_0 = { }
-    local _len_0 = 1
-    for k, v in pairs(value) do
-      _accum_0[_len_0] = k
-      _len_0 = _len_0 + 1
-    end
-    keys = _accum_0
-  end
-  sort(keys)
-  for _index_0 = 1, #keys do
-    local key = keys[_index_0]
-    json[#json + 1] = "'" .. tostring(key) .. "'::text"
-    json[#json + 1] = tostring(self(value[key]))
-  end
-  return "json_build_object(" .. tostring(concat(json, ', ')) .. ")"
-end
 ToSql.Lock = function(self, node) end
 ToSql.outer_join_type = function(self, node, join_type, lateral)
   if lateral == nil then

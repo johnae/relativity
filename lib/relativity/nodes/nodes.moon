@@ -85,12 +85,6 @@ As = Class 'As', Binary
   :As
   Assignment: Class 'Assignment', Binary
   Between: Class 'Between', Binary
-  JsonBuildObject: do
-    klazz = Class 'JsonBuildObject', Unary
-    klazz.as = (other) =>
-      As.new @, UnqualifiedName.new(other)
-    klazz
-
   DoesNotMatch: Class 'DoesNotMatch', Binary
   GreaterThan: Class 'GreaterThan', Binary
   GreaterThanOrEqual: Class 'GreaterThanOrEqual', Binary

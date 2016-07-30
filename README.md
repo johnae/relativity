@@ -163,14 +163,17 @@ others = Relativity.table 'others'
 
 any = Relativity.func 'ANY'
 coalesce = Relativity.func 'COALESCE'
+array_agg = Relativity.func 'array_agg'
+json_build_object = Relativity.func 'json_build_object'
+to_json = Relativity.func 'to_json'
 
 json_select = Relativity.select!
 json_select\from others
-json_select\project Relativity.as Relativity.array_agg(others\json 'id', 'name'), 'list'
+json_select\project array_agg(json_build_object 'id', others'id', 'name', others'name')\as 'list'
 json_select\where others'id'\eq any users'things'
 json_select = Relativity.alias json_select, 'things'
 
-things = Relativity.as Nodes.ToJson.new(Relativity.table'things''list'), 'things'
+things = to_json(Relativity.table'things''list')\as 'things'
 user_employer = coalesce(users'employer', 'none')\as 'employer'
 
 u = users\project users.star, user_employer, things
@@ -186,14 +189,13 @@ SELECT "users".*,
        to_json("things"."list") AS "things"
 FROM "users"
 INNER JOIN LATERAL (
-  SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list"
+  SELECT array_agg(json_build_object('id', "others"."id", 'name', "others"."name")) AS "list"
   FROM "others"
   WHERE "others"."id" = ANY("users"."things")
 ) "things" ON 't'
 WHERE "users"."name" LIKE '%berg%'
 ```
 
-I'd like to extend this even further for supporting most of the advanced Postgres functionality.
 
 ## Development
 

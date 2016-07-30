@@ -91,13 +91,16 @@ describe 'Relativity', ->
       ]], q\to_sql!
 
   describe 'advanced postgres queries', ->
+    local json_build_object
+    before_each ->
+      json_build_object = Relativity.func "json_build_object"
 
     it 'selecting json objects', ->
-      userinfo = users\json 'id', 'name'
+      userinfo = json_build_object 'id', users'id', 'name', users'name'
       userinfo = userinfo\as 'userinfo'
       user = users\project(userinfo)\where users'id'\eq 10
       assert.equal tr[[
-        SELECT json_build_object('id'::text, "users"."id", 'name'::text, "users"."name") AS "userinfo"
+        SELECT json_build_object('id', "users"."id", 'name', "users"."name") AS "userinfo"
         FROM "users"
         WHERE "users"."id" = 10
       ]], user\to_sql!
@@ -114,7 +117,8 @@ describe 'Relativity', ->
 
       json_select = Relativity.select!
       json_select\from others
-      json_select\project array_agg(others\json 'id', 'name')\as 'list'
+      json_object = json_build_object 'id', others'id', 'name', others'name'
+      json_select\project array_agg(json_object)\as 'list'
       json_select\where others'id'\eq any users'things'
       json_select = Relativity.alias json_select, 'things'
 
@@ -129,7 +133,7 @@ describe 'Relativity', ->
         SELECT "users".*, COALESCE("users"."employer", 'none') AS "employer", to_json("things"."list") AS "things"
         FROM "users"
         INNER JOIN LATERAL
-        (SELECT array_agg(json_build_object('id'::text, "others"."id", 'name'::text, "others"."name")) AS "list"
+        (SELECT array_agg(json_build_object('id', "others"."id", 'name', "others"."name")) AS "list"
         FROM "others" WHERE "others"."id" = ANY("users"."things")) "things" ON 't'
         WHERE "users"."name" LIKE '%berg%'
       ]], u\to_sql!
