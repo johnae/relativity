@@ -198,7 +198,15 @@ I'd like to extend this even further for supporting most of the advanced Postgre
 ## Development
 
 Running the tests requires busted https://github.com/Olivine-Labs/busted and luassert https://github.com/Olivine-Labs/luassert.
-It also requires that moonscript has been installed - see http://moonscript.org/.
+Since luassert comes with busted, only busted needs to be installed really. It also requires that moonscript is installed.
+
+On Ubuntu you might go about it like this:
+
+```shell
+sudo apt-get install luarocks luajit
+sudo luarocks install busted
+sudo luarocks install moonscript
+```
 
 To run the specs, run `busted spec`.
 
