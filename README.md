@@ -16,6 +16,8 @@ Relativity is sort of arel (https://github.com/rails/arel) but for moonscript/lu
 
 The point of this (as with arel) is to ease the generation of complex SQL queries. This does NOT adapt to different RDBMS systems (yet at least). I only care about Postgres. Shouldn't be that difficult to extend though.
 
+This could be used to create an ORM just like Arel is the ActiveRecord enabler in many ways. I might do something like this later.
+
 ## Lua compatibility
 
 To be honest, I'm only sure that this works properly with LuaJIT 2.x+. It should work with other Lua implementations too however - but I haven't tried. The CircleCI tests run on LuaJIT. The reason is that I'm only interested in LuaJIT (and OpenResty). Please test and help out if you feel like it.
