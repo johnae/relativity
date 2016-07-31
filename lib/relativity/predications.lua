@@ -42,7 +42,13 @@ return {
       ...
     })
   end,
-  In = function(self, other)
+  In = function(self, ...)
+    local other = {
+      ...
+    }
+    if #other == 1 then
+      other = other[1]
+    end
     local _exp_0 = other
     if SelectManager == _exp_0 then
       return Nodes.In.new(self, other.ast)
@@ -52,17 +58,26 @@ return {
       return Nodes.In.new(self, other)
     end
   end,
+  includes = function(self, ...)
+    return self:In(...)
+  end,
   in_any = function(self, ...)
-    return self:grouping_any('in', {
+    return self:grouping_any('In', {
       ...
     })
   end,
   in_all = function(self, ...)
-    return self:grouping_all('in', {
+    return self:grouping_all('In', {
       ...
     })
   end,
-  not_in = function(self, other)
+  not_in = function(self, ...)
+    local other = {
+      ...
+    }
+    if #other == 1 then
+      other = other[1]
+    end
     local _exp_0 = other
     if SelectManager == _exp_0 then
       return Nodes.NotIn.new(self, other.ast)
@@ -81,7 +96,7 @@ return {
     })
   end,
   matches = function(self, other)
-    return Nodes.Matches.new(self, other)
+    return Nodes.Like.new(self, other)
   end,
   matches_any = function(self, ...)
     return self:grouping_any('matches', {
@@ -180,7 +195,7 @@ return {
       local _len_0 = 1
       for _index_0 = 1, #others do
         local expr = others[_index_0]
-        _accum_0[_len_0] = expr[method_id](self, expr)
+        _accum_0[_len_0] = self[method_id](self, expr)
         _len_0 = _len_0 + 1
       end
       nodes = _accum_0
@@ -199,7 +214,7 @@ return {
       local _len_0 = 1
       for _index_0 = 1, #others do
         local expr = others[_index_0]
-        _accum_0[_len_0] = expr[method_id](self, expr)
+        _accum_0[_len_0] = self[method_id](self, expr)
         _len_0 = _len_0 + 1
       end
       nodes = _accum_0

@@ -28,7 +28,9 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   eq_all: (...) =>
     @grouping_all 'eq', {...}
 
-  In: (other) =>
+  In: (...) =>
+    other = {...}
+    other = other[1] if #other==1
     switch other
       when SelectManager
         Nodes.In.new @, other.ast
@@ -36,14 +38,18 @@ Nodes = defer -> require 'relativity.nodes.nodes'
         Nodes.Between.new @, Nodes.And.new(other.start, other.finish)
       else
         Nodes.In.new @, other
+  
+  includes: (...) => @In ...
 
   in_any: (...) =>
-    @grouping_any 'in', {...}
+    @grouping_any 'In', {...}
 
   in_all: (...) =>
-    @grouping_all 'in', {...}
+    @grouping_all 'In', {...}
 
-  not_in: (other) =>
+  not_in: (...) =>
+    other = {...}
+    other = other[1] if #other==1
     switch other
       when SelectManager
         Nodes.NotIn.new @, other.ast
@@ -57,7 +63,7 @@ Nodes = defer -> require 'relativity.nodes.nodes'
     @grouping_all 'not_in', {...}
 
   matches: (other) =>
-    Nodes.Matches.new @, other
+    Nodes.Like.new @, other
 
   matches_any: (...) =>
     @grouping_any 'matches', {...}
@@ -122,7 +128,7 @@ Nodes = defer -> require 'relativity.nodes.nodes'
     Nodes.Ordering.new @, 'desc'
 
   grouping_any: (method_id, others) =>
-    nodes = [expr[method_id](@, expr) for expr in *others]
+    nodes = [@[method_id](@, expr) for expr in *others]
     current = nodes[1]
     for i=2,#nodes
       node = nodes[i]
@@ -130,7 +136,7 @@ Nodes = defer -> require 'relativity.nodes.nodes'
     Nodes.Grouping.new current
 
   grouping_all: (method_id, others) =>
-    nodes = [expr[method_id](@, expr) for expr in *others]
+    nodes = [@[method_id](@, expr) for expr in *others]
     current = nodes[1]
     for i=2,#nodes
       node = nodes[i]

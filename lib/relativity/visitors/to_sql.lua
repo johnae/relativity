@@ -369,6 +369,9 @@ end
 ToSql.In = function(self, node)
   return tostring(self(node.left)) .. " IN (" .. tostring(self(node.right)) .. ")"
 end
+ToSql.NotIn = function(self, node)
+  return tostring(self(node.left)) .. " NOT IN (" .. tostring(self(node.right)) .. ")"
+end
 ToSql.Between = function(self, node)
   return tostring(self(node.left)) .. " BETWEEN (" .. tostring(self(node.right)) .. ")"
 end

@@ -246,6 +246,9 @@ ToSql.Except = (node) =>
 ToSql.In = (node) =>
   "#{@ node.left} IN (#{@ node.right})"
 
+ToSql.NotIn = (node) =>
+  "#{@ node.left} NOT IN (#{@ node.right})"
+
 ToSql.Between = (node) =>
   "#{@ node.left} BETWEEN (#{@ node.right})"
 
