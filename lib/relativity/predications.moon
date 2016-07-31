@@ -10,11 +10,11 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   not_eq: (other) =>
     Nodes.NotEqual.new @, other
 
-  not_eq_any: (others) =>
-    @grouping_any 'not_eq', others
+  not_eq_any: (...) =>
+    @grouping_any 'not_eq', {...}
 
-  not_eq_all: (others) =>
-    @grouping_all 'not_eq', others
+  not_eq_all: (...) =>
+    @grouping_all 'not_eq', {...}
 
   is_null: => Nodes.IsNull.new @
   not_null: => Nodes.NotNull.new @
@@ -22,26 +22,26 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   eq: (other) =>
     Nodes.Equality.new @, other
 
-  eq_any: (others) =>
-    @grouping_any 'eq', others
+  eq_any: (...) =>
+    @grouping_any 'eq', {...}
 
-  eq_all: (others) =>
-    @grouping_all 'eq', others
+  eq_all: (...) =>
+    @grouping_all 'eq', {...}
 
   In: (other) =>
     switch other
       when SelectManager
         Nodes.In.new @, other.ast
       when Range
-        Nodes.Between.new @, Nodes.And.new(other.start, other.finish) 
+        Nodes.Between.new @, Nodes.And.new(other.start, other.finish)
       else
         Nodes.In.new @, other
 
-  in_any: (others) =>
-    @grouping_any 'in', others
+  in_any: (...) =>
+    @grouping_any 'in', {...}
 
-  in_all: (others) =>
-    @grouping_all 'in', others
+  in_all: (...) =>
+    @grouping_all 'in', {...}
 
   not_in: (other) =>
     switch other
@@ -50,65 +50,65 @@ Nodes = defer -> require 'relativity.nodes.nodes'
       else
         Nodes.NotIn.new @, other
 
-  not_in_any: (others) =>
-    @grouping_any 'not_in', others
+  not_in_any: (...) =>
+    @grouping_any 'not_in', {...}
 
-  not_in_all: (others) =>
-    @grouping_all 'not_in', others
+  not_in_all: (...) =>
+    @grouping_all 'not_in', {...}
 
   matches: (other) =>
     Nodes.Matches.new @, other
 
-  matches_any: (others) =>
-    @grouping_any 'matches', others
+  matches_any: (...) =>
+    @grouping_any 'matches', {...}
 
-  matches_all: (others) =>
-    @grouping_all 'matches', others
+  matches_all: (...) =>
+    @grouping_all 'matches', {...}
 
   does_not_match: (other) =>
     Nodes.DoesNotMatch.new @, other
 
-  does_not_match_any: (others) =>
-    @grouping_any 'does_not_match', others
+  does_not_match_any: (...) =>
+    @grouping_any 'does_not_match', {...}
 
-  does_not_match_all: (others) =>
-    @grouping_all 'does_not_match', others
+  does_not_match_all: (...) =>
+    @grouping_all 'does_not_match', {...}
 
   gteq: (right) =>
     Nodes.GreaterThanOrEqual.new @, right
 
-  gteq_any: (others) =>
-    @grouping_any 'gteq', others
+  gteq_any: (...) =>
+    @grouping_any 'gteq', {...}
 
-  gteq_all: (others) =>
-    @grouping_all 'gteq', others
+  gteq_all: (...) =>
+    @grouping_all 'gteq', {...}
 
   gt: (right) =>
     Nodes.GreaterThan.new @, right
 
-  gt_any: (others) =>
-    @grouping_any 'gt', others
+  gt_any: (...) =>
+    @grouping_any 'gt', {...}
 
-  gt_all: (others) =>
-    @grouping_all 'gt', others
+  gt_all: (...) =>
+    @grouping_all 'gt', {...}
 
   lteq: (right) =>
     Nodes.LessThanOrEqual.new @, right
 
-  lteq_any: (others) =>
-    @grouping_any 'lteq', others
+  lteq_any: (...) =>
+    @grouping_any 'lteq', {...}
 
-  lteq_all: (others) =>
-    @grouping_all 'lteg', others
+  lteq_all: (...) =>
+    @grouping_all 'lteq', {...}
 
   lt: (right) =>
     Nodes.LessThan.new @, right
 
-  lt_any: (others) =>
-    @grouping_any 'lt', others
+  lt_any: (...) =>
+    @grouping_any 'lt', {...}
 
-  lt_all: (others) =>
-    @grouping_all 'lt', others
+  lt_all: (...) =>
+    @grouping_all 'lt', {...}
 
   like: (right) => Nodes.Like.new @, right
   ilike: (right) => Nodes.ILike.new @, right
@@ -121,30 +121,20 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   desc: =>
     Nodes.Ordering.new @, 'desc'
 
--- TODO: fix this
-  --grouping_any: (method_id, others) =>
-  --  print "Needs clone"
-  --  --others = u(others).clone()
-  --  --first = others[methodId](others.shift())
-  --  first = others[1]
-  --  others_copy = {}
-  --  for i, other in ipairs others
-  --    next if i==1
-  --    others_copy[#others_copy + 1] = other
+  grouping_any: (method_id, others) =>
+    nodes = [expr[method_id](@, expr) for expr in *others]
+    current = nodes[1]
+    for i=2,#nodes
+      node = nodes[i]
+      current = Nodes.Or.new current, node
+    Nodes.Grouping.new current
 
-  --  first = others[method_id](first)
+  grouping_all: (method_id, others) =>
+    nodes = [expr[method_id](@, expr) for expr in *others]
+    current = nodes[1]
+    for i=2,#nodes
+      node = nodes[i]
+      current = Nodes.And.new current, node
+    Nodes.Grouping.new current
 
-  --  Grouping.new 
-
-  --  n = @nodes()
-  --  new n.Grouping u(others).reduce first, (memo, expr) ->
-  --    new n.Or([memo, @[methodId](expr)])
-  --  
-  --groupingAll: (methodId, others) ->
-  --  others = u(others).clone()
-  --  first = others[methodId](others.shift())
-  --  
-  --  n = @nodes()
-  --  new n.Grouping u(others).reduce first, (memo, expr) ->
-  --    new n.And([memo, @[methodId](expr)])
 }

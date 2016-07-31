@@ -13,11 +13,15 @@ return {
   not_eq = function(self, other)
     return Nodes.NotEqual.new(self, other)
   end,
-  not_eq_any = function(self, others)
-    return self:grouping_any('not_eq', others)
+  not_eq_any = function(self, ...)
+    return self:grouping_any('not_eq', {
+      ...
+    })
   end,
-  not_eq_all = function(self, others)
-    return self:grouping_all('not_eq', others)
+  not_eq_all = function(self, ...)
+    return self:grouping_all('not_eq', {
+      ...
+    })
   end,
   is_null = function(self)
     return Nodes.IsNull.new(self)
@@ -28,11 +32,15 @@ return {
   eq = function(self, other)
     return Nodes.Equality.new(self, other)
   end,
-  eq_any = function(self, others)
-    return self:grouping_any('eq', others)
+  eq_any = function(self, ...)
+    return self:grouping_any('eq', {
+      ...
+    })
   end,
-  eq_all = function(self, others)
-    return self:grouping_all('eq', others)
+  eq_all = function(self, ...)
+    return self:grouping_all('eq', {
+      ...
+    })
   end,
   In = function(self, other)
     local _exp_0 = other
@@ -44,11 +52,15 @@ return {
       return Nodes.In.new(self, other)
     end
   end,
-  in_any = function(self, others)
-    return self:grouping_any('in', others)
+  in_any = function(self, ...)
+    return self:grouping_any('in', {
+      ...
+    })
   end,
-  in_all = function(self, others)
-    return self:grouping_all('in', others)
+  in_all = function(self, ...)
+    return self:grouping_all('in', {
+      ...
+    })
   end,
   not_in = function(self, other)
     local _exp_0 = other
@@ -58,65 +70,93 @@ return {
       return Nodes.NotIn.new(self, other)
     end
   end,
-  not_in_any = function(self, others)
-    return self:grouping_any('not_in', others)
+  not_in_any = function(self, ...)
+    return self:grouping_any('not_in', {
+      ...
+    })
   end,
-  not_in_all = function(self, others)
-    return self:grouping_all('not_in', others)
+  not_in_all = function(self, ...)
+    return self:grouping_all('not_in', {
+      ...
+    })
   end,
   matches = function(self, other)
     return Nodes.Matches.new(self, other)
   end,
-  matches_any = function(self, others)
-    return self:grouping_any('matches', others)
+  matches_any = function(self, ...)
+    return self:grouping_any('matches', {
+      ...
+    })
   end,
-  matches_all = function(self, others)
-    return self:grouping_all('matches', others)
+  matches_all = function(self, ...)
+    return self:grouping_all('matches', {
+      ...
+    })
   end,
   does_not_match = function(self, other)
     return Nodes.DoesNotMatch.new(self, other)
   end,
-  does_not_match_any = function(self, others)
-    return self:grouping_any('does_not_match', others)
+  does_not_match_any = function(self, ...)
+    return self:grouping_any('does_not_match', {
+      ...
+    })
   end,
-  does_not_match_all = function(self, others)
-    return self:grouping_all('does_not_match', others)
+  does_not_match_all = function(self, ...)
+    return self:grouping_all('does_not_match', {
+      ...
+    })
   end,
   gteq = function(self, right)
     return Nodes.GreaterThanOrEqual.new(self, right)
   end,
-  gteq_any = function(self, others)
-    return self:grouping_any('gteq', others)
+  gteq_any = function(self, ...)
+    return self:grouping_any('gteq', {
+      ...
+    })
   end,
-  gteq_all = function(self, others)
-    return self:grouping_all('gteq', others)
+  gteq_all = function(self, ...)
+    return self:grouping_all('gteq', {
+      ...
+    })
   end,
   gt = function(self, right)
     return Nodes.GreaterThan.new(self, right)
   end,
-  gt_any = function(self, others)
-    return self:grouping_any('gt', others)
+  gt_any = function(self, ...)
+    return self:grouping_any('gt', {
+      ...
+    })
   end,
-  gt_all = function(self, others)
-    return self:grouping_all('gt', others)
+  gt_all = function(self, ...)
+    return self:grouping_all('gt', {
+      ...
+    })
   end,
   lteq = function(self, right)
     return Nodes.LessThanOrEqual.new(self, right)
   end,
-  lteq_any = function(self, others)
-    return self:grouping_any('lteq', others)
+  lteq_any = function(self, ...)
+    return self:grouping_any('lteq', {
+      ...
+    })
   end,
-  lteq_all = function(self, others)
-    return self:grouping_all('lteg', others)
+  lteq_all = function(self, ...)
+    return self:grouping_all('lteq', {
+      ...
+    })
   end,
   lt = function(self, right)
     return Nodes.LessThan.new(self, right)
   end,
-  lt_any = function(self, others)
-    return self:grouping_any('lt', others)
+  lt_any = function(self, ...)
+    return self:grouping_any('lt', {
+      ...
+    })
   end,
-  lt_all = function(self, others)
-    return self:grouping_all('lt', others)
+  lt_all = function(self, ...)
+    return self:grouping_all('lt', {
+      ...
+    })
   end,
   like = function(self, right)
     return Nodes.Like.new(self, right)
@@ -132,5 +172,43 @@ return {
   end,
   desc = function(self)
     return Nodes.Ordering.new(self, 'desc')
+  end,
+  grouping_any = function(self, method_id, others)
+    local nodes
+    do
+      local _accum_0 = { }
+      local _len_0 = 1
+      for _index_0 = 1, #others do
+        local expr = others[_index_0]
+        _accum_0[_len_0] = expr[method_id](self, expr)
+        _len_0 = _len_0 + 1
+      end
+      nodes = _accum_0
+    end
+    local current = nodes[1]
+    for i = 2, #nodes do
+      local node = nodes[i]
+      current = Nodes.Or.new(current, node)
+    end
+    return Nodes.Grouping.new(current)
+  end,
+  grouping_all = function(self, method_id, others)
+    local nodes
+    do
+      local _accum_0 = { }
+      local _len_0 = 1
+      for _index_0 = 1, #others do
+        local expr = others[_index_0]
+        _accum_0[_len_0] = expr[method_id](self, expr)
+        _len_0 = _len_0 + 1
+      end
+      nodes = _accum_0
+    end
+    local current = nodes[1]
+    for i = 2, #nodes do
+      local node = nodes[i]
+      current = Nodes.And.new(current, node)
+    end
+    return Nodes.Grouping.new(current)
   end
 }
