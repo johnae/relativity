@@ -62,8 +62,11 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   not_in_all: (...) =>
     @grouping_all 'not_in', {...}
 
-  matches: (other) =>
-    Nodes.Like.new @, other
+  matches: (other, opts={}) =>
+    m = Nodes.Matches.new @, other
+    if opts.case_insensitive
+      m.case_insensitive = opts.case_insensitive
+    m
 
   matches_any: (...) =>
     @grouping_any 'matches', {...}
@@ -115,9 +118,6 @@ Nodes = defer -> require 'relativity.nodes.nodes'
 
   lt_all: (...) =>
     @grouping_all 'lt', {...}
-
-  like: (right) => Nodes.Like.new @, right
-  ilike: (right) => Nodes.ILike.new @, right
 
   any: (right) => Nodes.Any.new @, right
 

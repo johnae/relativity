@@ -127,7 +127,7 @@ describe 'Relativity', ->
 
       u = users\project users.star, user_employer, things
       u\join(json_select, Nodes.InnerJoinLateral)\on true
-      u\where users'name'\like '%berg%'
+      u\where users'name'\matches '%berg%'
 
       assert.equal tr[[
         SELECT "users".*, COALESCE("users"."employer", 'none') AS "employer", to_json("things"."list") AS "things"

@@ -3,17 +3,17 @@ Nodes = defer -> require 'relativity.nodes.nodes'
 
 {
   count: (distinct=false) =>
-    Nodes.Count.new {@}, distinct
+    Nodes.Count.new @, distinct
     
   sum: =>
-    Nodes.Sum.new {@}, Nodes.SqlLiteral.new('sum_id')
+    Nodes.Sum.new @
     
   maximum: =>
-    Nodes.Max.new {@}, Nodes.SqlLiteral.new('max_id')
+    Nodes.Max.new @
     
   minimum: =>
-    Nodes.Min.new {@}, Nodes.SqlLiteral.new('min_id')
+    Nodes.Min.new @
     
   average: =>
-    Nodes.Avg.new {@}, Nodes.SqlLiteral.new('avg_id')
+    Nodes.Avg.new @
 }

@@ -7,28 +7,18 @@ return {
     if distinct == nil then
       distinct = false
     end
-    return Nodes.Count.new({
-      self
-    }, distinct)
+    return Nodes.Count.new(self, distinct)
   end,
   sum = function(self)
-    return Nodes.Sum.new({
-      self
-    }, Nodes.SqlLiteral.new('sum_id'))
+    return Nodes.Sum.new(self)
   end,
   maximum = function(self)
-    return Nodes.Max.new({
-      self
-    }, Nodes.SqlLiteral.new('max_id'))
+    return Nodes.Max.new(self)
   end,
   minimum = function(self)
-    return Nodes.Min.new({
-      self
-    }, Nodes.SqlLiteral.new('min_id'))
+    return Nodes.Min.new(self)
   end,
   average = function(self)
-    return Nodes.Avg.new({
-      self
-    }, Nodes.SqlLiteral.new('avg_id'))
+    return Nodes.Avg.new(self)
   end
 }

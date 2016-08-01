@@ -50,6 +50,17 @@ do
   end
   UnqualifiedName = klazz
 end
+local Matches
+do
+  local klazz = Class('Matches', Binary)
+  klazz.set_case_insensitive = function(self, case_insensitive)
+    self._case_insensitive = case_insensitive
+  end
+  klazz.get_case_insensitive = function(self)
+    return self._case_insensitive or false
+  end
+  Matches = klazz
+end
 local As = Class('As', Binary)
 return {
   SelectStatement = SelectStatement,
@@ -97,11 +108,10 @@ return {
   DoesNotMatch = Class('DoesNotMatch', Binary),
   GreaterThan = Class('GreaterThan', Binary),
   GreaterThanOrEqual = Class('GreaterThanOrEqual', Binary),
-  Like = Class('Like', Binary),
-  ILike = Class('ILike', Binary),
   LessThan = Class('LessThan', Binary),
   LessThanOrEqual = Class('LessThanOrEqual', Binary),
-  Matches = Class('Matches', Binary),
+  Matches = Matches,
+  DoesNotMatch = Class('DoesNotMatch', Matches),
   NotEqual = Class('NotEqual', Binary),
   NotIn = Class('NotIn', Binary),
   Or = Class('Or', Binary),

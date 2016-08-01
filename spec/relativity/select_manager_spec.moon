@@ -521,7 +521,7 @@ describe 'Querying', ->
 
     it 'comparators all work', ->
       t = Relativity.table 'x'
-      q = Relativity.select!\project t('x')\lt(2), t('x')\lteq(2), t('x')\gt(2), t('x')\gteq(2), t('x')\not_eq(2), t('x')\is_null!, t('x')\not_null!, t('x')\like('%John%'), t('x')\ilike('%john%')
+      q = Relativity.select!\project t('x')\lt(2), t('x')\lteq(2), t('x')\gt(2), t('x')\gteq(2), t('x')\not_eq(2), t('x')\is_null!, t('x')\not_null!, t('x')\matches('%John%'), t('x')\matches('%john%', case_insensitive: true)
       assert.equal 'SELECT "x"."x" < 2, "x"."x" <= 2, "x"."x" > 2, "x"."x" >= 2, "x"."x" <> 2, "x"."x" IS NULL, "x"."x" IS NOT NULL, "x"."x" LIKE \'%John%\', "x"."x" ILIKE \'%john%\'', q\to_sql!
 
     it 'nulls', ->

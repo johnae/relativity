@@ -6,8 +6,8 @@ local InsertManager = require('relativity.select_manager')
 local UpdateManager = require('relativity.select_manager')
 local DeleteManager = require('relativity.delete_manager')
 local CaseBuilder = require('relativity.nodes.case_builder')
-local SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, ArrayAgg, TableAlias
-SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, ArrayAgg, TableAlias = Nodes.SqlLiteral, Nodes.FunctionNode, Nodes.ConstLit, Nodes.UnqualifiedName, Nodes.As, Nodes.Null, Nodes.ArrayAgg, Nodes.TableAlias
+local SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, TableAlias
+SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, TableAlias = Nodes.SqlLiteral, Nodes.FunctionNode, Nodes.ConstLit, Nodes.UnqualifiedName, Nodes.As, Nodes.Null, Nodes.TableAlias
 local null = Null.new()
 local star = SqlLiteral.new('*')
 local sql
@@ -67,8 +67,5 @@ return {
   end,
   case = function(...)
     return CaseBuilder.new(...)
-  end,
-  array_agg = function(...)
-    return ArrayAgg.new(...)
   end
 }

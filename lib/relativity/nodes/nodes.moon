@@ -29,7 +29,7 @@ With = do
 
 UnqualifiedName = do
   klazz = Class 'UnqualifiedName', Unary
-  klazz.get_attribute =  => @value
+  klazz.get_attribute = => @value
   klazz.set_attribute = (attr) => @value = attr
   klazz.get_relation = =>
     @value.relation
@@ -38,6 +38,15 @@ UnqualifiedName = do
   klazz.get_name = =>
     @value
   klazz
+
+Matches = do
+  klazz = Class 'Matches', Binary
+  klazz.set_case_insensitive = (case_insensitive) =>
+    @_case_insensitive = case_insensitive
+  klazz.get_case_insensitive = =>
+    @_case_insensitive or false
+  klazz
+
 
 As = Class 'As', Binary
 
@@ -88,11 +97,10 @@ As = Class 'As', Binary
   DoesNotMatch: Class 'DoesNotMatch', Binary
   GreaterThan: Class 'GreaterThan', Binary
   GreaterThanOrEqual: Class 'GreaterThanOrEqual', Binary
-  Like: Class 'Like', Binary
-  ILike: Class 'ILike', Binary
   LessThan: Class 'LessThan', Binary
   LessThanOrEqual: Class 'LessThanOrEqual', Binary
-  Matches: Class 'Matches', Binary
+  :Matches
+  DoesNotMatch: Class 'DoesNotMatch', Matches
   NotEqual: Class 'NotEqual', Binary
   NotIn: Class 'NotIn', Binary
   Or: Class 'Or', Binary

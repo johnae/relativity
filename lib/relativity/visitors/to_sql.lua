@@ -19,6 +19,17 @@ local ToSql = MultiMethod.new(function(node)
     return node_type
   end
 end)
+ToSql.aggregate = function(self, name, node)
+  local sql = tostring(name) .. "("
+  if node.distinct then
+    sql = "DISTINCT "
+  end
+  sql = tostring(sql) .. tostring(self(node.expressions)) .. ")"
+  if node.alias then
+    sql = tostring(sql) .. " AS " .. tostring(self(node.alias))
+  end
+  return sql
+end
 ToSql.all = function(self, list)
   return map(list, function(node)
     return self(node)
@@ -71,6 +82,21 @@ end
 ToSql.Assignment = function(self, node)
   local right = self:quote(node.right, self:column_for(node.left))
   return tostring(self(node.left)) .. " = " .. tostring(right)
+end
+ToSql.Min = function(self, node)
+  return self:aggregate('MIN', node)
+end
+ToSql.Max = function(self, node)
+  return self:aggregate('MAX', node)
+end
+ToSql.Sum = function(self, node)
+  return self:aggregate('SUM', node)
+end
+ToSql.Average = function(self, node)
+  return self:aggregate('AVG', node)
+end
+ToSql.Count = function(self, node)
+  return self:aggregate('COUNT', node)
 end
 ToSql.UnqualifiedName = function(self, node)
   return self:quote_column_name(node.name)
@@ -336,11 +362,17 @@ end
 ToSql.Union = function(self, node)
   return "(" .. tostring(self(node.left)) .. ") UNION (" .. tostring(self(node.right)) .. ")"
 end
-ToSql.Like = function(self, node)
-  return tostring(self(node.left)) .. " LIKE " .. tostring(self(node.right))
-end
-ToSql.ILike = function(self, node)
+ToSql.Matches = function(self, node)
+  if not (node.case_insensitive) then
+    return tostring(self(node.left)) .. " LIKE " .. tostring(self(node.right))
+  end
   return tostring(self(node.left)) .. " ILIKE " .. tostring(self(node.right))
+end
+ToSql.DoesNotMatch = function(self, node)
+  if not (node.case_insensitive) then
+    return tostring(self(node.left)) .. " NOT LIKE " .. tostring(self(node.right))
+  end
+  return tostring(self(node.left)) .. " NOT ILIKE " .. tostring(self(node.right))
 end
 ToSql.LessThan = function(self, node)
   return tostring(self(node.left)) .. " < " .. tostring(self(node.right))

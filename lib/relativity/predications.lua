@@ -95,8 +95,15 @@ return {
       ...
     })
   end,
-  matches = function(self, other)
-    return Nodes.Like.new(self, other)
+  matches = function(self, other, opts)
+    if opts == nil then
+      opts = { }
+    end
+    local m = Nodes.Matches.new(self, other)
+    if opts.case_insensitive then
+      m.case_insensitive = opts.case_insensitive
+    end
+    return m
   end,
   matches_any = function(self, ...)
     return self:grouping_any('matches', {
@@ -172,12 +179,6 @@ return {
     return self:grouping_all('lt', {
       ...
     })
-  end,
-  like = function(self, right)
-    return Nodes.Like.new(self, right)
-  end,
-  ilike = function(self, right)
-    return Nodes.ILike.new(self, right)
   end,
   any = function(self, right)
     return Nodes.Any.new(self, right)

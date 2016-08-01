@@ -13,6 +13,15 @@ ToSql = MultiMethod.new (node) ->
   else
     node_type
 
+ToSql.aggregate = (name, node) =>
+  sql = "#{name}("
+  if node.distinct
+    sql = "DISTINCT "
+  sql = "#{sql}#{@ node.expressions})"
+  if node.alias
+    sql = "#{sql} AS #{@ node.alias}"
+  sql
+
 ToSql.all = (list) => map list, (node) -> @ node
 
 ToSql.DeleteStatement = (node) =>
@@ -48,6 +57,21 @@ ToSql.UpdateStatement = (node) =>
 ToSql.Assignment = (node) =>
   right = @quote(node.right, @column_for(node.left))
   "#{@ node.left} = #{right}"
+
+ToSql.Min = (node) =>
+  @aggregate 'MIN', node
+
+ToSql.Max = (node) =>
+  @aggregate 'MAX', node
+
+ToSql.Sum = (node) =>
+  @aggregate 'SUM', node
+
+ToSql.Average = (node) =>
+  @aggregate 'AVG', node
+
+ToSql.Count = (node) =>
+  @aggregate 'COUNT', node
 
 ToSql.UnqualifiedName = (node) =>
   @quote_column_name node.name
@@ -213,11 +237,15 @@ ToSql.Exists = (node) =>
 ToSql.Union = (node) =>
   "(#{@ node.left}) UNION (#{@ node.right})"
 
-ToSql.Like = (node) =>
-  "#{@ node.left} LIKE #{@ node.right}"
-
-ToSql.ILike = (node) =>
+ToSql.Matches = (node) =>
+  unless node.case_insensitive
+    return "#{@ node.left} LIKE #{@ node.right}"
   "#{@ node.left} ILIKE #{@ node.right}"
+
+ToSql.DoesNotMatch = (node) =>
+  unless node.case_insensitive
+    return "#{@ node.left} NOT LIKE #{@ node.right}"
+  "#{@ node.left} NOT ILIKE #{@ node.right}"
 
 ToSql.LessThan = (node) =>
   "#{@ node.left} < #{@ node.right}"

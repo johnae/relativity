@@ -91,6 +91,13 @@ describe 'Predications', ->
       WHERE "users"."name" LIKE '%berg'
     ]], q\to_sql!
 
+  it '#matches case insensitive', ->
+    q = users\where users'name'\matches '%berg', case_insensitive: true
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."name" ILIKE '%berg'
+    ]], q\to_sql!
+
   it '#matches_any', ->
     q = users\where users'name'\matches_any '%berg', '%borg'
     assert.equal tr[[
@@ -103,4 +110,75 @@ describe 'Predications', ->
     assert.equal tr[[
       SELECT FROM "users"
       WHERE ("users"."name" LIKE '%berg' AND "users"."name" LIKE 'Heisen%')
+    ]], q\to_sql!
+
+  it '#does_not_match', ->
+    q = users\where users'name'\does_not_match '%berg'
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."name" NOT LIKE '%berg'
+    ]], q\to_sql!
+
+  it '#does_not_match_any', ->
+    q = users\where users'name'\does_not_match_any '%berg', '%borg'
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."name" NOT LIKE '%berg' OR "users"."name" NOT LIKE '%borg')
+    ]], q\to_sql!
+
+  it '#does_not_match_all', ->
+    q = users\where users'name'\does_not_match_all '%berg', '%borg'
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."name" NOT LIKE '%berg' AND "users"."name" NOT LIKE '%borg')
+    ]], q\to_sql!
+
+  it '#gt', ->
+    q = users\where users'age'\gt 18
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."age" > 18
+    ]], q\to_sql!
+
+  it '#gteq', ->
+    q = users\where users'age'\gteq 18
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."age" >= 18
+    ]], q\to_sql!
+
+  it '#gt_any', ->
+    allowed = Relativity.table'allowed'
+    a = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\gteq_any 18, a
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" >= 18 OR "users"."age" >= (SELECT MIN("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#gt_all', ->
+    allowed = Relativity.table'allowed'
+    a = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\gteq_all 18, a
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" >= 18 AND "users"."age" >= (SELECT MIN("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#lt', ->
+    q = users\where users'age'\lt 18
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."age" < 18
+    ]], q\to_sql!
+
+  it '#lteq', ->
+    q = users\where users'age'\lteq 18
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."age" <= 18
     ]], q\to_sql!
