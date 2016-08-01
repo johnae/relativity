@@ -24,9 +24,20 @@ SelectManager.project = (...) =>
     p[#p + 1] = projection
   @
 
-SelectManager.order = (...) =>
-  new_order = (x) -> type(x) == 'string' and Nodes.SqlLiteral.new(tostring(x)) or x
-  new_orders = [new_order(o) for o in *{...}]
+new_order = (expr, klazz) ->
+  if type(expr) == 'string'
+    return klazz.new Nodes.SqlLiteral.new(tostring(expr))
+  klazz.new expr
+
+SelectManager.asc = (...) =>
+  new_orders = [new_order(o, Nodes.Ascending) for o in *{...}]
+  o = @ast.orders
+  for order in *new_orders
+    o[#o + 1] = order
+  @
+
+SelectManager.desc = (...) =>
+  new_orders = [new_order(o, Nodes.Descending) for o in *{...}]
   o = @ast.orders
   for order in *new_orders
     o[#o + 1] = order

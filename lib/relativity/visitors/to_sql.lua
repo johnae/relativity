@@ -235,8 +235,11 @@ end
 ToSql.SqlLiteral = function(self, node)
   return tostring(node.value)
 end
-ToSql.Ordering = function(self, node)
-  return tostring(self(node.left)) .. " " .. tostring(node.right:upper())
+ToSql.Ascending = function(self, node)
+  return tostring(self(node.left)) .. " ASC"
+end
+ToSql.Descending = function(self, node)
+  return tostring(self(node.left)) .. " DESC"
 end
 ToSql.Group = function(self, node)
   return self(node.value)

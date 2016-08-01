@@ -149,8 +149,30 @@ describe 'Predications', ->
 
   it '#gt_any', ->
     allowed = Relativity.table'allowed'
-    a = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
-    q = users\where users'age'\gteq_any 18, a
+    allowed_currently = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\gt_any 18, allowed_currently
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" > 18 OR "users"."age" > (SELECT MIN("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#gt_all', ->
+    allowed = Relativity.table'allowed'
+    allowed_currently = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\gt_all 18, allowed_currently
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" > 18 AND "users"."age" > (SELECT MIN("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#gteq_any', ->
+    allowed = Relativity.table'allowed'
+    allowed_currently = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\gteq_any 18, allowed_currently
     assert.equal tr[[
       SELECT FROM "users"
       WHERE ("users"."age" >= 18 OR "users"."age" >= (SELECT MIN("allowed"."age")
@@ -158,10 +180,10 @@ describe 'Predications', ->
                                                       WHERE "allowed"."hour" = 23))
     ]], q\to_sql!
 
-  it '#gt_all', ->
+  it '#gteq_all', ->
     allowed = Relativity.table'allowed'
-    a = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
-    q = users\where users'age'\gteq_all 18, a
+    allowed_currently = allowed\project(allowed'age'\minimum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\gteq_all 18, allowed_currently
     assert.equal tr[[
       SELECT FROM "users"
       WHERE ("users"."age" >= 18 AND "users"."age" >= (SELECT MIN("allowed"."age")
@@ -182,3 +204,53 @@ describe 'Predications', ->
       SELECT FROM "users"
       WHERE "users"."age" <= 18
     ]], q\to_sql!
+
+  it '#lt_any', ->
+    allowed = Relativity.table'allowed'
+    allowed_currently = allowed\project(allowed'age'\maximum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\lt_any 18, allowed_currently
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" < 18 OR "users"."age" < (SELECT MAX("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#lt_all', ->
+    allowed = Relativity.table'allowed'
+    allowed_currently = allowed\project(allowed'age'\maximum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\lt_any 18, allowed_currently
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" < 18 OR "users"."age" < (SELECT MAX("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#lteq_any', ->
+    allowed = Relativity.table'allowed'
+    allowed_currently = allowed\project(allowed'age'\maximum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\lteq_any 18, allowed_currently
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" <= 18 OR "users"."age" <= (SELECT MAX("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#lteq_all', ->
+    allowed = Relativity.table'allowed'
+    allowed_currently = allowed\project(allowed'age'\maximum!)\where allowed'hour'\eq 23
+    q = users\where users'age'\lteq_any 18, allowed_currently
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE ("users"."age" <= 18 OR "users"."age" <= (SELECT MAX("allowed"."age")
+                                                      FROM "allowed"
+                                                      WHERE "allowed"."hour" = 23))
+    ]], q\to_sql!
+
+  it '#asc, #desc', ->
+    a = users\asc users'name'
+    d = users\desc users'name'
+    assert.equal 'SELECT FROM "users" ORDER BY "users"."name" ASC', a\to_sql!
+    assert.equal 'SELECT FROM "users" ORDER BY "users"."name" DESC', d\to_sql!

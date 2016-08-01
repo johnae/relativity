@@ -119,14 +119,6 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   lt_all: (...) =>
     @grouping_all 'lt', {...}
 
-  any: (right) => Nodes.Any.new @, right
-
-  asc: =>
-    Nodes.Ordering.new @, 'asc'
-
-  desc: =>
-    Nodes.Ordering.new @, 'desc'
-
   grouping_any: (method_id, others) =>
     nodes = [@[method_id](@, expr) for expr in *others]
     current = nodes[1]

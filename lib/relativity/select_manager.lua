@@ -35,11 +35,14 @@ SelectManager.project = function(self, ...)
   end
   return self
 end
-SelectManager.order = function(self, ...)
-  local new_order
-  new_order = function(x)
-    return type(x) == 'string' and Nodes.SqlLiteral.new(tostring(x)) or x
+local new_order
+new_order = function(expr, klazz)
+  if type(expr) == 'string' then
+    return klazz.new(Nodes.SqlLiteral.new(tostring(expr)))
   end
+  return klazz.new(expr)
+end
+SelectManager.asc = function(self, ...)
   local new_orders
   do
     local _accum_0 = { }
@@ -49,7 +52,29 @@ SelectManager.order = function(self, ...)
     }
     for _index_0 = 1, #_list_0 do
       local o = _list_0[_index_0]
-      _accum_0[_len_0] = new_order(o)
+      _accum_0[_len_0] = new_order(o, Nodes.Ascending)
+      _len_0 = _len_0 + 1
+    end
+    new_orders = _accum_0
+  end
+  local o = self.ast.orders
+  for _index_0 = 1, #new_orders do
+    local order = new_orders[_index_0]
+    o[#o + 1] = order
+  end
+  return self
+end
+SelectManager.desc = function(self, ...)
+  local new_orders
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    local _list_0 = {
+      ...
+    }
+    for _index_0 = 1, #_list_0 do
+      local o = _list_0[_index_0]
+      _accum_0[_len_0] = new_order(o, Nodes.Descending)
       _len_0 = _len_0 + 1
     end
     new_orders = _accum_0

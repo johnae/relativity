@@ -149,8 +149,11 @@ ToSql.literal = (node) => node
 
 ToSql.SqlLiteral = (node) => "#{node.value}"
 
-ToSql.Ordering = (node) =>
-  "#{@ node.left} #{node.right\upper!}"
+ToSql.Ascending = (node) =>
+  "#{@ node.left} ASC"
+
+ToSql.Descending = (node) =>
+  "#{@ node.left} DESC"
 
 ToSql.Group = (node) =>
   @ node.value

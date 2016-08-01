@@ -70,9 +70,13 @@ describe 'Table', ->
     rel = Table.new 'users', as: 'users'
     assert.not_nil rel.table_alias
 
-  it '#order takes an order', ->
-    mgr = table\order 'foo'
-    assert.equal 'SELECT FROM "users" ORDER BY foo', mgr\to_sql!
+  it '#asc orders by ascending', ->
+    mgr = table\asc 'foo'
+    assert.equal 'SELECT FROM "users" ORDER BY foo ASC', mgr\to_sql!
+
+  it '#desc orders by ascending', ->
+    mgr = table\desc 'foo'
+    assert.equal 'SELECT FROM "users" ORDER BY foo DESC', mgr\to_sql!
 
   it '#take adds a limit', ->
     mgr = table\take 1

@@ -108,7 +108,8 @@ As = Class 'As', Binary
   UnionAll: Class 'UnionAll', Binary
   Intersect: Class 'Intersect', Binary
   Except: Class 'Except', Binary
-  Ordering: Class 'Ordering', Binary
+  Ascending: Class 'Ascending', Binary
+  Descending: Class 'Descending', Binary
   IsNull: Class 'IsNull', Unary
   NotNull: Class 'NotNull', Unary
   Bin: Class 'Bin', Unary

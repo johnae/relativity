@@ -68,8 +68,11 @@ Table.having = (expr) =>
 Table.group = (...) =>
   @from(@)\group ...
 
-Table.order = (...) =>
-  @from(@)\order ...
+Table.asc = (...) =>
+  @from(@)\asc ...
+
+Table.desc = (...) =>
+  @from(@)\desc ...
 
 Table.take = (amount) =>
   @from(@)\take amount

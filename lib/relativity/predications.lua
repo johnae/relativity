@@ -180,15 +180,6 @@ return {
       ...
     })
   end,
-  any = function(self, right)
-    return Nodes.Any.new(self, right)
-  end,
-  asc = function(self)
-    return Nodes.Ordering.new(self, 'asc')
-  end,
-  desc = function(self)
-    return Nodes.Ordering.new(self, 'desc')
-  end,
   grouping_any = function(self, method_id, others)
     local nodes
     do

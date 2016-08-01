@@ -22,8 +22,8 @@ describe 'Querying', ->
 
       it 'accepts strings', ->
         sm\project Nodes.SqlLiteral.new('*')
-        sm\order 'foo'
-        assert.equal 'SELECT * FROM "users" ORDER BY foo', sm\to_sql!
+        sm\asc 'foo'
+        assert.equal 'SELECT * FROM "users" ORDER BY foo ASC', sm\to_sql!
 
     describe '#group', ->
 
@@ -242,9 +242,9 @@ describe 'Querying', ->
       it 'returns the order clauses', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
-        order = table 'id'
-        mgr\order table('id')
-        assert.equal order.name, mgr.orders[1].name
+        order = table'id'
+        mgr\asc order
+        assert.equal order.name, mgr.orders[1].left.name
 
     describe 'order', ->
 
@@ -253,28 +253,28 @@ describe 'Querying', ->
         mgr = SelectManager.new!
         mgr\project Relativity.star
         mgr\from table
-        mgr\order table('id')
-        assert.equal 'SELECT * FROM "users" ORDER BY "users"."id"', mgr\to_sql!
+        mgr\asc table'id'
+        assert.equal 'SELECT * FROM "users" ORDER BY "users"."id" ASC', mgr\to_sql!
 
       it 'takes variable number of arguments', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
         mgr\project Relativity.star
         mgr\from table
-        mgr\order table('id'), table('name')
-        assert.equal 'SELECT * FROM "users" ORDER BY "users"."id", "users"."name"', mgr\to_sql!
+        mgr\asc table'id', table'name'
+        assert.equal 'SELECT * FROM "users" ORDER BY "users"."id" ASC, "users"."name" ASC', mgr\to_sql!
 
       it 'chains', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
-        assert.equal mgr, mgr\order(table('id'))
+        assert.equal mgr, mgr\asc table'id'
 
       it 'supports order direction', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
         mgr\project Relativity.star
         mgr\from table
-        mgr\order table('id')\asc!, table('name')\desc!
+        mgr\asc(table'id')\desc table'name'--, table('name')\desc!
         assert.equal 'SELECT * FROM "users" ORDER BY "users"."id" ASC, "users"."name" DESC', mgr\to_sql!
 
     describe 'on', ->
@@ -391,8 +391,8 @@ describe 'Querying', ->
         table = Table.new 'users'
         mgr = SelectManager.new!
         mgr\from table
-        mgr\order table('id')
-        assert.equal '"users"."id"', tostring(mgr.order_clauses[1])
+        mgr\asc table'id'
+        assert.equal '"users"."id" ASC', tostring(mgr.order_clauses[1])
 
     describe 'group', ->
       it 'takes an attribute', ->

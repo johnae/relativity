@@ -81,8 +81,11 @@ end
 Table.group = function(self, ...)
   return self:from(self):group(...)
 end
-Table.order = function(self, ...)
-  return self:from(self):order(...)
+Table.asc = function(self, ...)
+  return self:from(self):asc(...)
+end
+Table.desc = function(self, ...)
+  return self:from(self):desc(...)
 end
 Table.take = function(self, amount)
   return self:from(self):take(amount)
