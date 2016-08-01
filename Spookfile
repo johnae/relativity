@@ -4,6 +4,8 @@ log_level "INFO"
 
 clr = os.getenv('LIGHT') and 'black' or 'white'
 
+package.loaded.lint_config = pcall -> loadfile('lint_config')()
+
 lint = require("moonscript.cmd.lint").lint_file
 colors = require "ansicolors"
 to_lua = require("moonscript").to_lua
