@@ -102,6 +102,7 @@ return {
   Max = Class('Max', FunctionNode),
   Min = Class('Min', FunctionNode),
   Avg = Class('Avg', FunctionNode),
+  Count = Class('Count', FunctionNode),
   As = As,
   Assignment = Class('Assignment', Binary),
   Between = Class('Between', Binary),

@@ -92,7 +92,7 @@ end
 ToSql.Sum = function(self, node)
   return self:aggregate('SUM', node)
 end
-ToSql.Average = function(self, node)
+ToSql.Avg = function(self, node)
   return self:aggregate('AVG', node)
 end
 ToSql.Count = function(self, node)

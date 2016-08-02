@@ -1,5 +1,4 @@
 Relativity = require 'relativity'
---Nodes = Relativity.Nodes
 
 describe 'Predications', ->
   local users

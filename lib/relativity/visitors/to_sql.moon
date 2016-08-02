@@ -67,7 +67,7 @@ ToSql.Max = (node) =>
 ToSql.Sum = (node) =>
   @aggregate 'SUM', node
 
-ToSql.Average = (node) =>
+ToSql.Avg = (node) =>
   @aggregate 'AVG', node
 
 ToSql.Count = (node) =>

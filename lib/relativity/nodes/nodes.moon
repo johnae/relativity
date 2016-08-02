@@ -90,6 +90,7 @@ As = Class 'As', Binary
   Max: Class 'Max', FunctionNode
   Min: Class 'Min', FunctionNode
   Avg: Class 'Avg', FunctionNode
+  Count: Class 'Count', FunctionNode
 
   :As
   Assignment: Class 'Assignment', Binary
