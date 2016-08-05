@@ -1,3 +1,5 @@
+require "relativity.globals"
+copy_value = copy_value
 Nodes = require 'relativity.nodes.nodes'
 {:TableAlias, :InnerJoin, :StringJoin, :And, :On, :Grouping} = Nodes
 
@@ -20,4 +22,6 @@ Nodes = require 'relativity.nodes.nodes'
 
   grouping: (expr) =>
     Grouping.new expr
+
+  clone: => copy_value @
 }

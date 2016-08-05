@@ -1,3 +1,5 @@
+require("relativity.globals")
+local copy_value = copy_value
 local Nodes = require('relativity.nodes.nodes')
 local TableAlias, InnerJoin, StringJoin, And, On, Grouping
 TableAlias, InnerJoin, StringJoin, And, On, Grouping = Nodes.TableAlias, Nodes.InnerJoin, Nodes.StringJoin, Nodes.And, Nodes.On, Nodes.Grouping
@@ -20,5 +22,8 @@ return {
   end,
   grouping = function(self, expr)
     return Grouping.new(expr)
+  end,
+  clone = function(self)
+    return copy_value(self)
   end
 }

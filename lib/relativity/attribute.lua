@@ -1,3 +1,5 @@
+require("relativity.globals")
+local copy_value = copy_value
 local Class = require('relativity.class')
 local Predications = require('relativity.predications')
 local Expressions = require('relativity.expressions')
@@ -17,5 +19,8 @@ Attribute.includes(Expressions)
 Attribute.includes(Predications)
 Attribute.__tostring = function(self)
   return self:to_sql()
+end
+Attribute.clone = function(self)
+  return copy_value(self)
 end
 return Attribute

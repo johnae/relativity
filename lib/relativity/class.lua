@@ -60,7 +60,9 @@ return function(name, parent)
     end
   end
   new_class.new = function(...)
-    local new_instance = setmetatable({ }, new_class)
+    local new_instance = setmetatable({
+      class = new_class
+    }, new_class)
     do
       local initialize = new_instance.initialize
       if initialize then

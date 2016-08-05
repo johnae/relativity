@@ -1,3 +1,5 @@
+require("relativity.globals")
+local copy_value = copy_value
 local Class = require("relativity.class")
 local defer = require("relativity.defer")
 local ToSql = defer(function()
@@ -39,5 +41,8 @@ Node.__mul = function(self, right)
 end
 Node.to_sql = function(self)
   return ToSql(self)
+end
+Node.clone = function(self)
+  return copy_value(self)
 end
 return Node

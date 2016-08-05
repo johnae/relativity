@@ -24,7 +24,7 @@
     for k, v in pairs tbl
       new_class[k] = v
   new_class.new = (...) ->
-    new_instance = setmetatable {}, new_class
+    new_instance = setmetatable {class: new_class}, new_class
     if initialize = new_instance.initialize
       initialize new_instance, ...
     new_instance

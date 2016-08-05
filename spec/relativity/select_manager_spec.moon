@@ -90,17 +90,30 @@ describe 'Querying', ->
         mgr\join(right)\on 'omg', '123'
         assert.equal 'SELECT FROM "users" INNER JOIN "users" "users_2" ON omg AND 123', mgr\to_sql!
 
+    describe 'clone', ->
 
---    # TODO Clone not implemented
---    describe 'clone', ->
---
---      it 'returns a clone', ->
---        table = Table.new 'users'
---        table\as 'foo'
---        mgr = table\from table
---        mgr2 = mgr\clone!
---        mgr2\project 'foo'
---        assert.not_equal mgr\to_sql!, mgr2\to_sql!
+      it 'returns a clone', ->
+        table = Table.new 'users'
+        mgr = table\from table
+        mgr\project 'quux'
+        mgr\where table'id'\gt 1
+        mgr2 = mgr\clone!
+        mgr2\where table'name'\matches '%clone%'
+        mgr2\project 'foo', mgr\as 'baz'
+        mgr\where table'value'\lt 100
+        assert.equal tr[[
+          SELECT quux
+          FROM "users"
+          WHERE "users"."id" > 1 AND "users"."value" < 100
+        ]], mgr\to_sql!
+        assert.equal tr[[
+          SELECT quux, foo, (SELECT quux
+                             FROM "users"
+                             WHERE "users"."id" > 1 AND "users"."value" < 100) "baz"
+          FROM "users"
+          WHERE "users"."id" > 1
+          AND "users"."name" LIKE '%clone%'
+        ]], mgr2\to_sql!
 
     describe 'skip', ->
 
