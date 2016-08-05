@@ -253,3 +253,15 @@ describe 'Predications', ->
     d = users\desc users'name'
     assert.equal 'SELECT FROM "users" ORDER BY "users"."name" ASC', a\to_sql!
     assert.equal 'SELECT FROM "users" ORDER BY "users"."name" DESC', d\to_sql!
+
+  it '#search', ->
+    rank = Relativity.func'ts_rank'
+    to_tsquery = Relativity.func'to_tsquery'
+    tsquery = to_tsquery'abc | cde'
+    search = users\where users'document'\search tsquery
+    search\desc rank users'document', tsquery
+    assert.equal tr[[
+      SELECT FROM "users"
+      WHERE "users"."document" @@ to_tsquery('abc | cde')
+      ORDER BY ts_rank("users"."document", to_tsquery('abc | cde')) DESC
+    ]], search\to_sql!

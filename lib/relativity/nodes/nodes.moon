@@ -100,6 +100,7 @@ As = Class 'As', Binary
   GreaterThanOrEqual: Class 'GreaterThanOrEqual', Binary
   LessThan: Class 'LessThan', Binary
   LessThanOrEqual: Class 'LessThanOrEqual', Binary
+  Search: Class 'Search', Binary
   :Matches
   DoesNotMatch: Class 'DoesNotMatch', Matches
   NotEqual: Class 'NotEqual', Binary

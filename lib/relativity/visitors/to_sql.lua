@@ -98,6 +98,9 @@ end
 ToSql.Count = function(self, node)
   return self:aggregate('COUNT', node)
 end
+ToSql.Search = function(self, node)
+  return tostring(self(node.left)) .. " @@ " .. tostring(self(node.right))
+end
 ToSql.UnqualifiedName = function(self, node)
   return self:quote_column_name(node.name)
 end

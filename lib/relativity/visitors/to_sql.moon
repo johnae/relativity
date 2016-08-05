@@ -73,6 +73,9 @@ ToSql.Avg = (node) =>
 ToSql.Count = (node) =>
   @aggregate 'COUNT', node
 
+ToSql.Search = (node) =>
+  "#{@ node.left} @@ #{@ node.right}"
+
 ToSql.UnqualifiedName = (node) =>
   @quote_column_name node.name
 

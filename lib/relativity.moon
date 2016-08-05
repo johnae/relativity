@@ -13,9 +13,18 @@ star = SqlLiteral.new '*'
 sql = (raw_sql) -> SqlLiteral.new raw_sql
 as = (a,b) -> As.new a, UnqualifiedName.new(b)
 alias = (a, b) -> TableAlias.new a, b
+
 func = (name) -> (...) ->
   args = {...}
-  FunctionNode.new args, sql(name)
+  FunctionNode.new args, sql name
+
+opt_func = (name) -> (opts={}) ->
+  args = {}
+  for k, v in pairs opts
+    args[#args + 1] = k
+    args[#args + 1] = v
+  FunctionNode.new args, sql name
+
 
 {
   VERSION: '0.0.1'
@@ -26,6 +35,7 @@ func = (name) -> (...) ->
   :as
   :alias
   :func
+  :opt_func
 
   range: (start, finish) -> Range.new start, finish
   lit: (value) -> ConstLit.new value

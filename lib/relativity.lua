@@ -31,6 +31,20 @@ func = function(name)
     return FunctionNode.new(args, sql(name))
   end
 end
+local opt_func
+opt_func = function(name)
+  return function(opts)
+    if opts == nil then
+      opts = { }
+    end
+    local args = { }
+    for k, v in pairs(opts) do
+      args[#args + 1] = k
+      args[#args + 1] = v
+    end
+    return FunctionNode.new(args, sql(name))
+  end
+end
 return {
   VERSION = '0.0.1',
   sql = sql,
@@ -39,6 +53,7 @@ return {
   as = as,
   alias = alias,
   func = func,
+  opt_func = opt_func,
   range = function(start, finish)
     return Range.new(start, finish)
   end,

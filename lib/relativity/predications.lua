@@ -180,6 +180,9 @@ return {
       ...
     })
   end,
+  search = function(self, right)
+    return Nodes.Search.new(self, right)
+  end,
   grouping_any = function(self, method_id, others)
     local nodes
     do
