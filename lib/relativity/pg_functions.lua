@@ -16,6 +16,7 @@ end
 return {
   ts_rank = f('ts_rank'),
   to_tsquery = f('to_tsquery'),
+  coalesce = f('COALESCE'),
   any = f('ANY'),
   to_json = f('to_json'),
   json_build_object = of('json_build_object'),
