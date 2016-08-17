@@ -9,9 +9,16 @@ any = (t) -> not empty(t)
 
 map = (list, fun) -> [fun(item) for item in *list]
 
+merge = (t1, t2) ->
+  res = {k, v for k, v in pairs t1}
+  for k, v in pairs t2
+    res[k] = v
+  res
+
 table.empty = empty
 table.any = any
 table.map = map
+table.merge = merge
 
 export *
 
