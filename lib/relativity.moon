@@ -6,9 +6,9 @@ InsertManager = require 'relativity.select_manager'
 UpdateManager = require 'relativity.select_manager'
 DeleteManager = require 'relativity.delete_manager'
 CaseBuilder = require 'relativity.nodes.case_builder'
-{:SqlLiteral, :FunctionNode, :ConstLit, :UnqualifiedName, :As, :Null, :TableAlias} = Nodes
+{:SqlLiteral, :FunctionNode, :ConstLit, :UnqualifiedName, :As, :TableAlias} = Nodes
 
-null = Null.new!
+null = SqlLiteral.new 'NULL'
 star = SqlLiteral.new '*'
 sql = (raw_sql) -> SqlLiteral.new raw_sql
 as = (a,b) -> As.new a, UnqualifiedName.new(b)

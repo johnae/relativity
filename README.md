@@ -8,7 +8,7 @@ https://github.com/johnae/relativity
 
 Please first note that this is incredibly __raw__, far from completed and will probably need a bit of redesign (I'd like to use more Luaisms in places if possible). There are some missing pieces still. It should be usable however.
 
-Relativity is sort of arel (https://github.com/rails/arel) but for moonscript/lua. As far as I know there is nothing like it (other than this) for Lua/MoonScript. This project owes alot to Rubys Arel and also to the nodejs project called rel (https://github.com/yang/rel). It also shares some caveats with that project, namely:
+Relativity is sort of [arel](https://github.com/rails/arel) but for moonscript/lua. As far as I know there is nothing like it (other than this) for Lua/MoonScript. This project owes alot to Rubys Arel and also to the nodejs project called [rel](https://github.com/yang/rel). It also shares some caveats with that project, namely:
 
 * No database connections, it only builds queries.
 * Where ruby can do funky stuff, lua sometimes can. When possible
@@ -25,6 +25,10 @@ To be honest, I'm only sure that this works properly with LuaJIT 2.x+. It should
 ## Performance
 
 Query generation hasn't been benchmarked __at all__. I don't know whether there's a bottleneck, memory issue or something else hiding. I think there may be performance gains in increasing the amount of local use - a well known optimization for Lua. I'll hold off on any such optimizations until it's clear that they'd help.
+
+## Classes
+
+This library is using my take on a class implementation for MoonScript: [Classy](https://github.com/johnae/classy).
 
 ## Usage
 
@@ -138,7 +142,7 @@ There's also Not which is a reserved keyword. For now both of the below do the s
 Using title case:
 
 ```moonscript
-users\where users'id'\eq(10)\Not!
+users\where users'id'\eq(10).not
 ```
 
 Or lpeg:ish

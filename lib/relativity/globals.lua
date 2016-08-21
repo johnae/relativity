@@ -45,18 +45,4 @@ table.empty = empty
 table.any = any
 table.map = map
 table.merge = merge
-copy_value = function(self, copies)
-  if not (type(self) == 'table') then
-    return self
-  end
-  if copies and copies[self] then
-    return copies[self]
-  end
-  copies = copies or { }
-  local copy = setmetatable({ }, getmetatable(self))
-  copies[self] = copy
-  for k, v in pairs(self) do
-    copy[copy_value(k, copies)] = copy_value(v, copies)
-  end
-  return copy
-end
+copy_value = require('classy').copy_value

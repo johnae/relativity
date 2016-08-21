@@ -22,12 +22,4 @@ table.merge = merge
 
 export *
 
-copy_value = (copies) =>
-  return @ unless type(@) == 'table'
-  return copies[@] if copies and copies[@]
-  copies or= {}
-  copy = setmetatable {}, getmetatable @
-  copies[@] = copy
-  for k, v in pairs @
-    copy[copy_value(k, copies)] = copy_value v, copies
-  copy
+copy_value = require'classy'.copy_value

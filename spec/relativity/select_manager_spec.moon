@@ -11,8 +11,8 @@ describe 'Querying', ->
 
     describe '#project', ->
       it 'accepts sql literals', ->
-        sm\project Relativity.sql 'id'
-        assert.equal sm\to_sql!, "SELECT id FROM \"users\""
+        sm\project Relativity.sql'id'
+        assert.equal "SELECT id FROM \"users\"", sm\to_sql!
 
       it 'accepts string constants', ->
         sm\project 'foo'
@@ -36,13 +36,13 @@ describe 'Querying', ->
 
       it 'makes an AS node by grouping the AST', ->
         as = sm\as Relativity.sql('foo')
-        assert.equal Nodes.Grouping, as.left
+        assert.true as.left.is_a[Nodes.Grouping]
         assert.equal sm.ast, as.left.value
         assert.equal 'foo', tostring(as.right)
 
       it 'converts right to SqlLiteral if string', ->
         as = sm\as 'foo'
-        assert.equal Nodes.SqlLiteral, as.right
+        assert.true as.right.is_a[Nodes.SqlLiteral]
 
       it 'converting to sql returns proper AS sql', ->
         sub = Relativity.select!\project(1)
@@ -65,7 +65,7 @@ describe 'Querying', ->
         mgr = SelectManager.new table
         mgr\from table
         mgr\from 'users'
-        mgr\project table\attribute 'id'
+        mgr\project table'id'
         assert.equal 'SELECT "users"."id" FROM users', mgr\to_sql!
 
       it 'can filter by multiple items', ->
@@ -131,8 +131,8 @@ describe 'Querying', ->
       it 'handles removing the skip', ->
         table = Table.new 'users'
         mgr = table\from table
-        assert.equal mgr\skip(10)\to_sql!, 'SELECT FROM "users" OFFSET 10'
-        assert.equal mgr\skip(nil)\to_sql!, 'SELECT FROM "users"'
+        assert.equal 'SELECT FROM "users" OFFSET 10', mgr\skip(10)\to_sql!
+        assert.equal 'SELECT FROM "users"', mgr\skip(nil)\to_sql!
 
     describe 'exists', ->
 
@@ -141,7 +141,7 @@ describe 'Querying', ->
         mgr = SelectManager.new table
         mgr\project Nodes.SqlLiteral.new('*')
         m2 = SelectManager.new!
-        m2\project mgr\exists!
+        m2\project mgr.exists
         assert.equal "SELECT EXISTS (#{mgr\to_sql!})", m2\to_sql!
 
       it 'can be aliased', ->
@@ -149,7 +149,7 @@ describe 'Querying', ->
         mgr = SelectManager.new table
         mgr\project Nodes.SqlLiteral.new('*')
         m2 = SelectManager.new!
-        m2\project mgr\exists!\as 'foo'
+        m2\project mgr.exists\as 'foo'
         assert.equal "SELECT EXISTS (#{mgr\to_sql!}) AS \"foo\"", m2\to_sql!
 
     describe 'union', ->
@@ -158,11 +158,11 @@ describe 'Querying', ->
         table = Table.new 'users'
         m1 = SelectManager.new table
         m1\project Relativity.star
-        m1\where table('age')\lt 18
+        m1\where table'age'\lt 18
 
         m2 = SelectManager.new table
         m2\project Relativity.star
-        m2\where table('age')\gt 99
+        m2\where table'age'\gt 99
 
       it 'unions two managers', ->
         node = m1\union m2
@@ -178,11 +178,11 @@ describe 'Querying', ->
         table = Table.new 'users'
         m1 = SelectManager.new table
         m1\project Relativity.star
-        m1\where table('age')\In(Relativity.range(18,60))
+        m1\where table'age'\In(Relativity.range(18,60))
 
         m2 = SelectManager.new table
         m2\project Relativity.star
-        m2\where table('age')\In(Relativity.range(40,99))
+        m2\where table'age'\In(Relativity.range(40,99))
 
       it 'excepts two managers', ->
         node = m1\except m2
@@ -195,11 +195,11 @@ describe 'Querying', ->
         table = Table.new 'users'
         m1 = SelectManager.new table
         m1\project Relativity.star
-        m1\where table('age')\gt 18
+        m1\where table'age'\gt 18
 
         m2 = SelectManager.new table
         m2\project Relativity.star
-        m2\where table('age')\lt 99
+        m2\where table'age'\lt 99
 
       it 'intersects two managers', ->
         node = m1\intersect m2
@@ -242,7 +242,7 @@ describe 'Querying', ->
       it 'returns the limit', ->
         mgr = SelectManager.new!
         mgr\take 10
-        assert.equal mgr.taken, 10
+        assert.equal 10, mgr.taken
 
     --describe 'lock', ->
     --  it 'adds a lock', ->
@@ -329,20 +329,20 @@ describe 'Querying', ->
         relation = SelectManager.new!
         children = {'foo', 'bar', 'baz'}
         clause = relation\create_and children
-        assert.equal Nodes.And, clause
+        assert.true clause.is_a[Nodes.And]
         assert.equal children, clause.children
 
       it 'creates JOIN nodes', ->
         relation = SelectManager.new!
         join = relation\create_join 'foo', 'bar'
-        assert.equal Nodes.InnerJoin, join
+        assert.true join.is_a[Nodes.InnerJoin]
         assert.equal 'foo', join.left
         assert.equal 'bar', join.right
 
       it 'creates JOIN nodes of specific class', ->
         relation = SelectManager.new!
         join = relation\create_join 'foo', 'bar', Nodes.LeftOuterJoin
-        assert.equal Nodes.LeftOuterJoin, join
+        assert.true join.is_a[Nodes.LeftOuterJoin]
         assert.equal 'foo', join.left
         assert.equal 'bar', join.right
 
@@ -491,7 +491,7 @@ describe 'Querying', ->
 
         mgr = left\join right
         mgr\project Relativity.sql('*')
-        assert.equal SelectManager, mgr\on(predicate)
+        assert.true mgr\on(predicate).is_a[SelectManager]
 
         assert.equal 'SELECT * FROM "users" INNER JOIN "users" "users_2" ON "users"."id" = "users_2"."id"', mgr\to_sql!
 
@@ -515,7 +515,7 @@ describe 'Querying', ->
         assert.equal 'SELECT "users"."id" FROM "users" WHERE "users"."underage" = \'t\'', mgr\to_sql!
 
       it 'not', ->
-        mgr\where table('age')\gt(18)\Not!
+        mgr\where table('age')\gt(18).not
         assert.equal 'SELECT "users"."id" FROM "users" WHERE NOT ("users"."age" > 18)', mgr\to_sql!
 
     describe 'subqueries', ->
@@ -562,7 +562,7 @@ describe 'Querying', ->
         ]], q\to_sql!
 
     it 'constant literals', ->
-      assert.equal "SELECT NOT ('f')", Relativity.select!\project(Relativity.lit(false)\Not!)\to_sql!
+      assert.equal "SELECT NOT ('f')", Relativity.select!\project(Relativity.lit(false).not)\to_sql!
       assert.equal "SELECT 3 = 3", Relativity.select!\project(Relativity.lit(3)\eq(Relativity.lit(3)))\to_sql!
       assert.equal "SELECT 'a' IN ('a')", Relativity.select!\project(Relativity.lit('a')\In(Relativity.lit({'a'})))\to_sql!
 

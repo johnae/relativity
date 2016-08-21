@@ -3,7 +3,7 @@ DeleteManager = require 'relativity.delete_manager'
 UpdateManager = require 'relativity.update_manager'
 SqlLiteral = require 'relativity.nodes.sql_literal'
 
-Crud = 
+{
   compile_insert: (values) =>
     im = @create_insert!
     im\insert values
@@ -31,5 +31,4 @@ Crud =
     um\order @ast.orders
     um\wheres @ctx.wheres
     um
-
-Crud
+}

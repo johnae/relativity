@@ -6,12 +6,13 @@ Attributes = require 'relativity.attributes'
 {:SelectStatement, :In, :SqlLiteral} = Nodes
 {:concat, :empty, :any, :sort, :map} = table
 
-ToSql = MultiMethod.new (node) ->
-  node_type = type(node)
-  if node_type == 'table' and node.__class
-    node.__class
-  else
-    node_type
+object_type = (o) ->
+  o_type = type o
+  if o_type == 'table' and o.__type
+    return o.__type
+  o_type
+
+ToSql = MultiMethod.new object_type
 
 ToSql.aggregate = (name, node) =>
   sql = "#{name}("
@@ -55,7 +56,7 @@ ToSql.UpdateStatement = (node) =>
   sql
 
 ToSql.Assignment = (node) =>
-  right = @quote(node.right, @column_for(node.left))
+  right = @quote node.right
   "#{@ node.left} = #{right}"
 
 ToSql.Min = (node) =>
@@ -89,7 +90,7 @@ ToSql.InsertStatement = (node) =>
 
 ToSql.Values = (node) =>
   sql = map node.expressions, (expr) ->
-    if expr == SqlLiteral
+    if object_type(expr) == SqlLiteral.__type
       @ expr
     else
       @quote expr, nil
@@ -132,14 +133,15 @@ ToSql.Table = (node) =>
     @quote_table_name node.name
 
 ToSql.quote_table_name = (name) =>
-  if name == SqlLiteral
+  if object_type(name) == SqlLiteral.__type
     return name
   "\"#{name}\""
 
 ToSql.quote_column_name = (name) =>
-  if name == SqlLiteral
+  t = object_type name
+  if t == SqlLiteral.__type
     name
-  else if name == Attribute
+  else if t == Attribute.__type
     "\"#{name.name}\""
   else
     "\"#{name}\""
@@ -181,6 +183,7 @@ ToSql.AttrBoolean = (node) => @Attribute node
 ToSql.quoted = (node) =>
   @quote node, @last_column
 
+ToSql.nil = (value) => 'NULL'
 ToSql.string = (value) => @quoted value
 ToSql.date = (value) => @quoted value
 ToSql.boolean = (value) => @quoted value
@@ -189,21 +192,16 @@ ToSql.table = (value) => "#{concat [@quoted(v) for v in *value], ', '}"
 
 ToSql.ConstLit = (node) => @ node.value
 
-ToSql.Null = (node) => 'NULL'
-
 -- dates? time?
 ToSql.quote = (value, column) =>
-  if type(value) == 'boolean'
-    value and "'t'" or "'f'"
-  else if not value
+  t = object_type value
+  if t == 'boolean'
+    return value and "'t'" or "'f'"
+  if value == nil
     return 'NULL'
-  else if type(value) == 'number'
-    value
-  else if type(value) == 'table' and value.__class == 'Null'
-    'NULL'
-  else
-    "'#{value}'"
-
+  if t == 'number'
+    return value
+  "'#{value}'"
 
 ToSql.column_for = (attr) =>
   tostring attr.name
@@ -351,7 +349,7 @@ ToSql.Grouping = (node) =>
   "(#{@ node.value})"
 
 ToSql.FunctionNode = (node) =>
-  "#{@ node.alias}(#{concat [@(x) for x in *node.expressions], ', '})"
+  "#{@ node.name}(#{concat [@(x) for x in *node.expressions], ', '})"
 
 ToSql.Case = (node) =>
   sql = {'CASE'}
@@ -363,8 +361,6 @@ ToSql.Case = (node) =>
   sql[#sql + 1] = "ELSE #{@ node._else}" if node._else
   sql[#sql + 1] = "END"
   concat sql, ' '
-
-ToSql.Null = => 'NULL'
 
 ToSql.IsNull = (node) =>
   "#{@ node.value} IS NULL"

@@ -1,7 +1,8 @@
-Class = require "relativity.class"
+define = require'classy'.define
 Node = require "relativity.nodes.node"
 
-Unary = Class "Unary", Node
-Unary.initialize = (expr) =>
-  @value = expr
-Unary
+define 'Unary', ->
+  parent Node
+  instance
+    initialize: (expr) =>
+      @value = expr

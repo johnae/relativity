@@ -1,7 +1,10 @@
-local Class = require("relativity.class")
+local define = require('classy').define
 local Node = require("relativity.nodes.node")
-local Binary = Class("Binary", Node)
-Binary.initialize = function(self, left, right)
-  self.left, self.right = left, right
-end
-return Binary
+return define('Binary', function()
+  parent(Node)
+  return instance({
+    initialize = function(self, left, right)
+      self.left, self.right = left, right
+    end
+  })
+end)

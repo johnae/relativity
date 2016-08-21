@@ -1,12 +1,10 @@
 Node = require 'relativity.nodes.node'
-Class = require 'relativity.class'
+define = require'classy'.define
 
-InsertStatement = Class 'InsertStatement', Node
-InsertStatement.initialize = =>
-  @relation = nil
-  @columns = {}
-  @values = nil
-
-InsertStatement
-
--- TODO: copy?
+define 'InsertStatement', ->
+  parent Node
+  instance
+    initialize: =>
+      @relation = nil
+      @columns = {}
+      @values = nil

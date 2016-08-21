@@ -1,6 +1,6 @@
 require("relativity.globals")
 local copy_value = copy_value
-local Class = require("relativity.class")
+local define = require('classy').define
 local defer = require("relativity.defer")
 local ToSql = defer(function()
   return require("relativity.visitors.to_sql")
@@ -17,32 +17,35 @@ end)
 local And = defer(function()
   return require("relativity.nodes.nodes").And
 end)
-local Node = Class("Node")
-Node.Not = function(self)
-  return Not.new(self)
-end
-Node.__unm = function(self, right)
-  return self:Not()
-end
-Node.Or = function(self, right)
-  return Grouping.new(Or.new(self, right))
-end
-Node.__add = function(self, right)
-  return self:Or(right)
-end
-Node.And = function(self, right)
-  return And.new({
-    self,
-    right
+return define('Node', function()
+  properties({
+    ["not"] = function(self)
+      return Not.new(self)
+    end
   })
-end
-Node.__mul = function(self, right)
-  return self:And(right)
-end
-Node.to_sql = function(self)
-  return ToSql(self)
-end
-Node.clone = function(self)
-  return copy_value(self)
-end
-return Node
+  instance({
+    Or = function(self, right)
+      return Grouping.new(Or.new(self, right))
+    end,
+    And = function(self, right)
+      return And.new({
+        self,
+        right
+      })
+    end,
+    to_sql = function(self)
+      return ToSql(self)
+    end
+  })
+  return meta({
+    __unm = function(self)
+      return Not.new(self)
+    end,
+    __add = function(self, right)
+      return self:Or(right)
+    end,
+    __mul = function(self, right)
+      return self:And(right)
+    end
+  })
+end)

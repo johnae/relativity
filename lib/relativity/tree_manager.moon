@@ -1,22 +1,23 @@
 FactoryMethods = require 'relativity.factory_methods'
-Class = require 'relativity.class'
+define = require'classy'.define
 defer = require 'relativity.defer'
-
-TreeManager = Class 'TreeManager', FactoryMethods
 ToSql = defer -> require 'relativity.visitors.to_sql'
 
-TreeManager.initialize = =>
-  @ast = nil
-  @ctx = nil
+define 'TreeManager', ->
+  include FactoryMethods
 
-TreeManager.to_sql = => ToSql @ast
+  instance
+    initialize: =>
+      @ast = nil
+      @ctx = nil
 
-TreeManager.where = (expr) =>
-  if TreeManager == expr
-    expr = expr.ast
-  @ctx.wheres or= {}
-  w = @ctx.wheres
-  w[#w + 1] = expr
-  @
+    to_sql: =>
+      ToSql @ast
 
-TreeManager
+    where: (expr) =>
+      if expr == @
+        expr = expr.ast
+      @ctx.wheres or= {}
+      w = @ctx.wheres
+      w[#w + 1] = expr
+      @

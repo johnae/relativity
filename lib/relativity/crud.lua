@@ -2,7 +2,7 @@ local InsertManager = require('relativity.insert_manager')
 local DeleteManager = require('relativity.delete_manager')
 local UpdateManager = require('relativity.update_manager')
 local SqlLiteral = require('relativity.nodes.sql_literal')
-local Crud = {
+return {
   compile_insert = function(self, values)
     local im = self:create_insert()
     im:insert(values)
@@ -35,4 +35,3 @@ local Crud = {
     return um
   end
 }
-return Crud

@@ -1,33 +1,34 @@
-Class = require "relativity.class"
+define = require'classy'.define
 Node = require "relativity.nodes.node"
 Expressions = require "relativity.expressions"
 Predications = require "relativity.predications"
 
-Case = Class "Case", Node
-Case.initialize = (base, cases, _else) =>
-  @_base = base
-  @_cases = cases
-  @_else = _else
+Case = define 'Case', ->
+  parent Node
+  include Expressions
+  include Predications
+  instance
+    initialize: (base, cases, _else) =>
+      @_base = base
+      @_cases = cases
+      @_else = _else
 
-Case.includes Expressions
-Case.includes Predications
+define 'CaseBuilder', ->
+  parent Node
+  instance
+    initialize: (base) =>
+      @_base = base
+      @_cases = {}
+      @_else = nil
 
-CaseBuilder = Class "CaseBuilder", Node
-CaseBuilder.initialize = (base) =>
-  @_base = base
-  @_cases = {}
-  @_else = nil
+    When: (cond, res) =>
+      cases = @_cases
+      cases[#cases + 1] = {cond, res}
+      @
 
-CaseBuilder.When = (cond, res) =>
-  cases = @_cases
-  cases[#cases + 1] = {cond, res}
-  @
+    Else: (res) =>
+      @_else = res
+      @
 
-CaseBuilder.Else = (res) =>
-  @_else = res
-  @
-
-CaseBuilder.End = =>
-  Case.new @_base, @_cases, @_else
-
-CaseBuilder
+    End: =>
+      Case.new @_base, @_cases, @_else

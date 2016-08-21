@@ -5,81 +5,85 @@ Attributes = require 'relativity.attributes'
 Nodes = defer -> require 'relativity.nodes.nodes'
 FactoryMethods = require 'relativity.factory_methods'
 Crud = require 'relativity.crud'
-Class = require 'relativity.class'
+define = require'classy'.define
 
 Attribute = Attributes.Attribute
 
-Table = Class 'Table'
-Table.includes FactoryMethods
-Table.includes Crud
-Table.initialize = (name, opts={}) =>
-  @name = name
-  @columns = nil
-  @aliases = {}
-  @table_alias = opts.as if opts.as
+define 'Table', ->
+  include FactoryMethods
+  include Crud
+  properties
+    star: => Nodes.TableStar.new @
+  -- it could, in theory, be a missing_property
+  -- but that wouldn't allow all names (like name
+  -- for example which is an instance variable)
+  meta
+    __call: (name) =>
+      attr = @__cached_attributes[name]
+      return attr if attr
+      attr = Attribute.new @, name
+      @__cached_attributes[name] = attr
+      attr
+  instance
+    initialize: (name, opts={}) =>
+      @__cached_attributes = {}
+      @name = name
+      @columns = nil
+      @aliases = {}
+      @table_alias = opts.as
 
-Table.from = (table) =>
-  SelectManager.new table
+    from: (table) =>
+      SelectManager.new table
 
-Table.project = (...) =>
-  @from(@)\project ...
+    project: (...) =>
+      @from(@)\project ...
 
-Table.attribute = (name) =>
-  Attribute.new @, name
+    alias: (name) =>
+      name = "#{@name}_2" unless name
+      aliases = @aliases
+      aliases[#aliases + 1] = Nodes.TableAlias.new @, name
+      aliases[#aliases]
 
-Table.alias = (name) =>
-  name = "#{@name}_2" unless name
-  aliases = @aliases
-  aliases[#aliases + 1] = Nodes.TableAlias.new @, name
-  aliases[#aliases]
+    json: (...) =>
+      opts = {}
+      for attr in *{...}
+        opts[attr] = @ attr
+      Nodes.JsonBuildObject.new opts
 
-Table.__call = (name) =>
-  Attribute.new @, name
+    join: (relation, klazz) =>
+      klazz or= Nodes.InnerJoin
+      return @from @ unless relation
 
-Table.json = (...) =>
-  opts = {}
-  for attr in *{...}
-    opts[attr] = @ attr
-  Nodes.JsonBuildObject.new opts
+      klazz = if relation == Nodes.StringJoin or type(relation) == 'string'
+        Nodes.StringJoin
+      else
+        klazz
 
-Table.join = (relation, klazz) =>
-  klazz or= Nodes.InnerJoin
-  return @from @ unless relation
+      @from(@)\join relation, klazz
 
-  klazz = if relation == Nodes.StringJoin or type(relation) == 'string'
-    Nodes.StringJoin
-  else
-    klazz
+    insert_manager: =>
+      InsertManager.new!
 
-  @from(@)\join relation, klazz
+    skip: (amount) =>
+      @from(@)\skip amount
 
-Table.insert_manager = =>
-  InsertManager.new!
+    select_manager: =>
+      SelectManager.new!
 
-Table.skip = (amount) =>
-  @from(@)\skip amount
+    having: (expr) =>
+      @from(@)\having expr
 
-Table.select_manager = =>
-  SelectManager.new!
+    group: (...) =>
+      @from(@)\group ...
 
-Table.having = (expr) =>
-  @from(@)\having expr
+    asc: (...) =>
+      @from(@)\asc ...
 
-Table.group = (...) =>
-  @from(@)\group ...
+    desc: (...) =>
+      @from(@)\desc ...
 
-Table.asc = (...) =>
-  @from(@)\asc ...
+    take: (amount) =>
+      @from(@)\take amount
 
-Table.desc = (...) =>
-  @from(@)\desc ...
-
-Table.take = (amount) =>
-  @from(@)\take amount
-
-Table.where = (condition) =>
-  @from(@)\where condition
-
-Table.get_star = => Nodes.TableStar.new @
-
-Table
+    where: (condition) =>
+      @from(@)\where condition

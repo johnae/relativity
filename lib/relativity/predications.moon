@@ -3,6 +3,12 @@ defer = require 'relativity.defer'
 SelectManager = defer -> require 'relativity.select_manager'
 Nodes = defer -> require 'relativity.nodes.nodes'
 
+object_type = (o) ->
+  t = type o
+  if t == 'table' and o.__type
+    return o.__type
+  t
+
 {
   as: (other) =>
     Nodes.As.new @, Nodes.UnqualifiedName.new(other)
@@ -31,13 +37,12 @@ Nodes = defer -> require 'relativity.nodes.nodes'
   In: (...) =>
     other = {...}
     other = other[1] if #other==1
-    switch other
-      when SelectManager
-        Nodes.In.new @, other.ast
-      when Range
-        Nodes.Between.new @, Nodes.And.new(other.start, other.finish)
-      else
-        Nodes.In.new @, other
+    t = object_type other
+    if t == SelectManager.__type
+      return Nodes.In.new @, other.ast
+    if t == Range.__type
+      return Nodes.Between.new @, Nodes.And.new(other.start, other.finish)
+    Nodes.In.new @, other
   
   includes: (...) => @In ...
 

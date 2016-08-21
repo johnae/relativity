@@ -1,7 +1,10 @@
-local Class = require("relativity.class")
+local define = require('classy').define
 local Node = require("relativity.nodes.node")
-local Unary = Class("Unary", Node)
-Unary.initialize = function(self, expr)
-  self.value = expr
-end
-return Unary
+return define('Unary', function()
+  parent(Node)
+  return instance({
+    initialize = function(self, expr)
+      self.value = expr
+    end
+  })
+end)
