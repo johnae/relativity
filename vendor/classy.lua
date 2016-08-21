@@ -56,6 +56,7 @@ return {
         __instance[name] = def
       end
     end
+    local include = instance
     local parent
     parent = function(parent)
       parent_class = parent
@@ -109,12 +110,6 @@ return {
             end
           }
         end
-      end
-    end
-    local include
-    include = function(tbl)
-      for k, v in pairs(tbl) do
-        __instance[k] = v
       end
     end
     local meta

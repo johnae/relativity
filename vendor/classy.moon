@@ -32,6 +32,8 @@ copy_value = (copies) =>
       for name, def in pairs opts
         __instance[name] = def
 
+    include = instance -- same thing, different name
+
     parent = (parent) -> parent_class = parent
 
     missing_prop =
@@ -53,10 +55,6 @@ copy_value = (copies) =>
           __properties[key] =
             get: => @[field][key]
             set: (v) => @[field][key] = v
-
-    include = (tbl) ->
-      for k, v in pairs tbl
-        __instance[k] = v
 
     meta = (opts={}) ->
       for name, def in pairs opts
