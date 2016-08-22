@@ -1,5 +1,4 @@
-local merge
-merge = function(t1, t2)
+local merge = table.merge or function(t1, t2)
   local res
   do
     local _tbl_0 = { }
@@ -44,15 +43,32 @@ return {
       __instance = __instance,
       __meta = __meta
     }
+    local new
+    new = function(...)
+      local new_instance = setmetatable({ }, __meta)
+      new_instance.initialize(new_instance, ...)
+      return new_instance
+    end
+    local default_function_env = setmetatable({
+      new = new
+    }, {
+      __index = _G
+    })
     local static
     static = function(opts)
       for name, def in pairs(opts) do
+        if type(def) == 'function' then
+          setfenv(def, default_function_env)
+        end
         new_class[name] = def
       end
     end
     local instance
     instance = function(opts)
       for name, def in pairs(opts) do
+        if type(def) == 'function' then
+          setfenv(def, default_function_env)
+        end
         __instance[name] = def
       end
     end
@@ -118,6 +134,9 @@ return {
         opts = { }
       end
       for name, def in pairs(opts) do
+        if type(def) == 'function' then
+          setfenv(def, default_function_env)
+        end
         __meta[name] = def
       end
     end
@@ -159,11 +178,8 @@ return {
           local new_def = __instance[name]
           if new_def then
             if type(new_def) == 'function' then
-              local env = setmetatable({
-                super = def
-              }, {
-                __index = _G
-              })
+              local env = copy_value(default_function_env)
+              env.super = def
               setfenv(new_def, env)
             end
           else
@@ -221,14 +237,6 @@ return {
       return rawset(self, k, v)
     end
     __instance.initialize = __instance.initialize or function(self) end
-    local new
-    new = function(...)
-      local new_instance = setmetatable({
-        new = new
-      }, __meta)
-      new_instance.initialize(new_instance, ...)
-      return new_instance
-    end
     new_class.new = new
     return new_class
   end

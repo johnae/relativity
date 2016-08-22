@@ -1,4 +1,4 @@
-merge = (t1, t2) ->
+merge = table.merge or (t1, t2) ->
   res = {k, v for k, v in pairs t1}
   for k, v in pairs t2
     res[k] = v
@@ -24,12 +24,23 @@ copy_value = (copies) =>
     __meta = {}
     new_class = __type: name, :__properties, :is_a, :__instance, :__meta
 
+    new = (...) ->
+      new_instance = setmetatable {}, __meta
+      new_instance.initialize new_instance, ...
+      new_instance
+
+    default_function_env = setmetatable {:new}, __index: _G
+
     static = (opts) ->
       for name, def in pairs opts
+        if type(def) == 'function'
+          setfenv def, default_function_env
         new_class[name] = def
 
     instance = (opts) ->
       for name, def in pairs opts
+        if type(def) == 'function'
+          setfenv def, default_function_env
         __instance[name] = def
 
     include = instance -- same thing, different name
@@ -58,6 +69,8 @@ copy_value = (copies) =>
 
     meta = (opts={}) ->
       for name, def in pairs opts
+        if type(def) == 'function'
+          setfenv def, default_function_env
         __meta[name] = def
 
     class_initializer_env = setmetatable {
@@ -92,7 +105,8 @@ copy_value = (copies) =>
           -- this enables calling "super" in a function to
           -- run the same name function from parent
           if type(new_def) == 'function'
-            env = setmetatable {super: def}, __index: _G
+            env = copy_value default_function_env -- also includes 'new' as directly callable
+            env.super = def
             setfenv new_def, env
         else
           __instance[name] = def
@@ -125,12 +139,6 @@ copy_value = (copies) =>
       rawset @, k, v
 
     __instance.initialize or= =>
-
-    new = (...) ->
-      -- allows calling new from instance context
-      new_instance = setmetatable :new, __meta
-      new_instance.initialize new_instance, ...
-      new_instance
     new_class.new = new
     new_class
 }
