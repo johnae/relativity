@@ -8,7 +8,7 @@ https://github.com/johnae/relativity
 
 First off - this is a bit __raw__ and may need a bit of redesign (perhaps more Luaisms in places if possible). It should be usable however.
 
-Relativity is sort of [arel](https://github.com/rails/arel) but for moonscript/lua. As far as I know there is nothing like it (other than this) for Lua/MoonScript. This project owes alot to Rubys Arel and also to the nodejs project called [rel](https://github.com/yang/rel). It also shares some caveats with that project, namely:
+Relativity is sort of [arel](https://github.com/rails/arel) but for [MoonScript](http://moonscript.org) and [Lua](https://www.lua.org). As far as I know there is nothing like it (other than this) for Lua/MoonScript. This project owes alot to Rubys Arel and also to the nodejs project called [rel](https://github.com/yang/rel). It also shares some caveats with that project, namely:
 
 * No database connections, it only builds queries.
 * Where Ruby can do funky stuff, Lua sometimes can. When possible
@@ -20,7 +20,7 @@ This could be used to create an ORM just like Arel is the ActiveRecord enabler i
 
 ## Lua compatibility
 
-To be honest, I'm only sure that this works properly with LuaJIT 2.x+. It should work with other Lua implementations too however - but I haven't tried. The CircleCI tests run on LuaJIT. The reason is that I'm only interested in LuaJIT (and OpenResty). Please test and help out if you feel like it.
+To be honest, I'm only sure that this works properly with [LuaJIT 2.x+](http://luajit.org/). It should work with other Lua implementations too however - but I haven't tried. The CircleCI tests run on LuaJIT. The reason is that I'm only interested in LuaJIT (and OpenResty). Please test and help out if you feel like it.
 
 ## Performance
 
