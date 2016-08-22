@@ -11,14 +11,7 @@ do
   local _obj_0 = table
   concat, empty, any, sort, map = _obj_0.concat, _obj_0.empty, _obj_0.any, _obj_0.sort, _obj_0.map
 end
-local object_type
-object_type = function(o)
-  local o_type = type(o)
-  if o_type == 'table' and o.__type then
-    return o.__type
-  end
-  return o_type
-end
+local object_type = _G.object_type
 local ToSql = MultiMethod.new(object_type)
 ToSql.aggregate = function(self, name, node)
   local sql = tostring(name) .. "("

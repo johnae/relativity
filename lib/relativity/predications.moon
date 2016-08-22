@@ -1,13 +1,9 @@
+require 'relativity.globals'
 Range = require 'relativity.range'
 defer = require 'relativity.defer'
 SelectManager = defer -> require 'relativity.select_manager'
 Nodes = defer -> require 'relativity.nodes.nodes'
-
-object_type = (o) ->
-  t = type o
-  if t == 'table' and o.__type
-    return o.__type
-  t
+object_type = _G.object_type
 
 {
   as: (other) =>

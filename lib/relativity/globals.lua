@@ -41,8 +41,15 @@ merge = function(t1, t2)
   end
   return res
 end
-table.empty = empty
-table.any = any
-table.map = map
-table.merge = merge
+table.empty = table.empty or empty
+table.any = table.any or any
+table.map = table.map or map
+table.merge = table.merge or merge
+object_type = function(o)
+  local o_type = type(o)
+  if o_type == 'table' and o.__type then
+    return o.__type
+  end
+  return o_type
+end
 copy_value = require('classy').copy_value

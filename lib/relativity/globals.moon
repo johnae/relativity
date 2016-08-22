@@ -15,11 +15,17 @@ merge = (t1, t2) ->
     res[k] = v
   res
 
-table.empty = empty
-table.any = any
-table.map = map
-table.merge = merge
+table.empty or= empty
+table.any or= any
+table.map or= map
+table.merge or= merge
 
 export *
+
+object_type = (o) ->
+  o_type = type o
+  if o_type == 'table' and o.__type
+    return o.__type
+  o_type
 
 copy_value = require'classy'.copy_value

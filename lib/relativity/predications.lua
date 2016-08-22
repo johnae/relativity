@@ -1,3 +1,4 @@
+require('relativity.globals')
 local Range = require('relativity.range')
 local defer = require('relativity.defer')
 local SelectManager = defer(function()
@@ -6,14 +7,7 @@ end)
 local Nodes = defer(function()
   return require('relativity.nodes.nodes')
 end)
-local object_type
-object_type = function(o)
-  local t = type(o)
-  if t == 'table' and o.__type then
-    return o.__type
-  end
-  return t
-end
+local object_type = _G.object_type
 return {
   as = function(self, other)
     return Nodes.As.new(self, Nodes.UnqualifiedName.new(other))

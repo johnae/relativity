@@ -5,12 +5,7 @@ Attributes = require 'relativity.attributes'
 {:Attribute} = Attributes
 {:SelectStatement, :In, :SqlLiteral} = Nodes
 {:concat, :empty, :any, :sort, :map} = table
-
-object_type = (o) ->
-  o_type = type o
-  if o_type == 'table' and o.__type
-    return o.__type
-  o_type
+object_type = _G.object_type
 
 ToSql = MultiMethod.new object_type
 
