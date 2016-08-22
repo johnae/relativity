@@ -9,38 +9,38 @@ describe 'Table', ->
     table = Table.new 'users'
 
   it 'has a from method', ->
-    assert.not_nil table.from('user')
+    assert.not_nil table\from('user')
 
   it 'can project things', ->
-    assert.not_nil 'SELECT * FROM "users"', table\project(Nodes.SqlLiteral.new('*'))
+    assert.not_nil table\project(Nodes.SqlLiteral.new('*'))
 
   it 'returns sql', ->
     assert.equal 'SELECT * FROM "users"', table\project(Nodes.SqlLiteral.new('*'))\to_sql!
 
   it 'creates string join nodes', ->
     join = table\create_string_join 'foo'
-    assert.equal join, Nodes.StringJoin
+    assert.true join.is_a[Nodes.StringJoin]
 
   it 'creates join nodes', ->
     join = table\create_join 'foo', 'bar'
-    assert.equal join, Nodes.InnerJoin
+    assert.true join.is_a[Nodes.InnerJoin]
     assert.equal join.left, 'foo'
     assert.equal join.right, 'bar'
 
   it 'creates join nodes with a class', ->
     join = table\create_join 'foo', 'bar', Nodes.LeftOuterJoin
-    assert.equal join, Nodes.LeftOuterJoin
+    assert.true join.is_a[Nodes.LeftOuterJoin]
     assert.equal join.left, 'foo'
     assert.equal join.right, 'bar'
 
   it 'returns an insert manager', ->
     im = table\compile_insert 'VALUES(NULL)'
-    assert.equal InsertManager, im
+    assert.true im.is_a[InsertManager]
     assert.equal 'INSERT INTO NULL VALUES(NULL)', im\to_sql!
 
   it '#insert_manager returns an InsertManager', ->
     im = table\insert_manager!
-    assert.equal InsertManager, im
+    assert.true im.is_a[InsertManager]
 
   it '#skip adds an offset', ->
     sm = table\skip 2
@@ -48,15 +48,15 @@ describe 'Table', ->
 
   it '#select_manager returns a select manager', ->
     sm = table\select_manager!
-    assert.equal SelectManager, sm
+    assert.true sm.is_a[SelectManager]
     assert.equal 'SELECT', sm\to_sql!
 
   it '#having adds a having clause', ->
-    mgr = table\having table('id')\eq(10)
+    mgr = table\having table'id'\eq(10)
     assert.equal 'SELECT FROM "users" HAVING "users"."id" = 10', mgr\to_sql!
 
   it '#group should create a group', ->
-    mgr = table\group table('id')
+    mgr = table\group table'id'
     assert.equal 'SELECT FROM "users" GROUP BY "users"."id"', mgr\to_sql!
 
   it '#alias creates a node that proxies a table', ->
@@ -92,15 +92,15 @@ describe 'Table', ->
     assert.equal 'SELECT *, * FROM "users"', mgr\to_sql!
 
   it '#where returns a tree manager', ->
-    mgr = table\where table('id')\eq(1)
-    mgr\project table('id')
+    mgr = table\where table'id'\eq(1)
+    mgr\project table'id'
     assert.equal 'SELECT "users"."id" FROM "users" WHERE "users"."id" = 1', mgr\to_sql!
 
   it 'has a name', ->
     assert.equal 'users', table.name
 
-  it 'calling a table returns a column', ->
-    column = table 'id'
+  it 'referencing an attribute on a table returns a column', ->
+    column = table'id'
     assert.equal 'id', column.name
 
   it '#star returns table.*', ->

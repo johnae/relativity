@@ -1,15 +1,12 @@
-Class = require 'relativity.class'
+define = require'classy'.define
 SelectCore = require 'relativity.nodes.select_core'
 
-SelectStatement = Class 'SelectStatement'
-SelectStatement.initialize = (cores) =>
-  @cores = cores or {SelectCore.new!}
-  @orders = {}
-  @limit = nil
-  @lock = nil
-  @offset = nil
-  @with = nil
-
-SelectStatement
-
--- TODO: copy?
+define 'SelectStatement', ->
+  instance
+    initialize: (cores) =>
+      @cores = cores or {SelectCore.new!}
+      @orders = {}
+      @limit = nil
+      @lock = nil
+      @offset = nil
+      @with = nil

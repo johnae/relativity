@@ -23,7 +23,11 @@ describe 'InsertManager', ->
     assert.equal 'INSERT INTO "users" ("bool") VALUES (\'f\')', im\to_sql!
 
   it 'inserts null', ->
-    im\insert {{users('id'), Relativity.null}}
+    im\insert {{users'id', Relativity.null}}
+    assert.equal 'INSERT INTO "users" ("id") VALUES (NULL)', im\to_sql!
+
+  it 'inserts nil as NULL', ->
+    im\insert {{users'id', nil}}
     assert.equal 'INSERT INTO "users" ("id") VALUES (NULL)', im\to_sql!
 
   -- TODO: handle this properly somewhere
@@ -38,11 +42,11 @@ describe 'InsertManager', ->
 
   it 'takes a list of lists', ->
     im\into users
-    im\insert {{users('id'), 1}, {users('name'), 'ricky'}}
+    im\insert {{users'id', 1}, {users'name', 'ricky'}}
     assert.equal 'INSERT INTO "users" ("id", "name") VALUES (1, \'ricky\')', im\to_sql!
 
   it 'defaults the table', ->
-    im\insert {{users('id'), 1}, {users('name'), 'ricky'}}
+    im\insert {{users'id', 1}, {users'name', 'ricky'}}
     assert.equal 'INSERT INTO "users" ("id", "name") VALUES (1, \'ricky\')', im\to_sql!
 
   it 'accepts an empty list', ->

@@ -1,9 +1,9 @@
 Binary = require 'relativity.nodes.binary'
-Class = require 'relativity.class'
+define = require'classy'.define
 
-JoinSource = Class 'JoinSource', Binary
-JoinSource.initialize = (single_source, joinop) =>
-  Binary.initialize @, single_source, joinop
-  @right = {}
-
-JoinSource
+define 'JoinSource', ->
+  parent Binary
+  instance
+    initialize: (single_source, joinop) =>
+      super @, single_source, joinop
+      @right = {}

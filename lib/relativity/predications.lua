@@ -1,3 +1,4 @@
+require('relativity.globals')
 local Range = require('relativity.range')
 local defer = require('relativity.defer')
 local SelectManager = defer(function()
@@ -6,6 +7,7 @@ end)
 local Nodes = defer(function()
   return require('relativity.nodes.nodes')
 end)
+local object_type = _G.object_type
 return {
   as = function(self, other)
     return Nodes.As.new(self, Nodes.UnqualifiedName.new(other))
@@ -49,14 +51,14 @@ return {
     if #other == 1 then
       other = other[1]
     end
-    local _exp_0 = other
-    if SelectManager == _exp_0 then
+    local t = object_type(other)
+    if t == SelectManager.__type then
       return Nodes.In.new(self, other.ast)
-    elseif Range == _exp_0 then
-      return Nodes.Between.new(self, Nodes.And.new(other.start, other.finish))
-    else
-      return Nodes.In.new(self, other)
     end
+    if t == Range.__type then
+      return Nodes.Between.new(self, Nodes.And.new(other.start, other.finish))
+    end
+    return Nodes.In.new(self, other)
   end,
   includes = function(self, ...)
     return self:In(...)

@@ -11,14 +11,8 @@ do
   local _obj_0 = table
   concat, empty, any, sort, map = _obj_0.concat, _obj_0.empty, _obj_0.any, _obj_0.sort, _obj_0.map
 end
-local ToSql = MultiMethod.new(function(node)
-  local node_type = type(node)
-  if node_type == 'table' and node.__class then
-    return node.__class
-  else
-    return node_type
-  end
-end)
+local object_type = _G.object_type
+local ToSql = MultiMethod.new(object_type)
 ToSql.aggregate = function(self, name, node)
   local sql = tostring(name) .. "("
   if node.distinct then
@@ -80,7 +74,7 @@ ToSql.UpdateStatement = function(self, node)
   return sql
 end
 ToSql.Assignment = function(self, node)
-  local right = self:quote(node.right, self:column_for(node.left))
+  local right = self:quote(node.right)
   return tostring(self(node.left)) .. " = " .. tostring(right)
 end
 ToSql.Min = function(self, node)
@@ -120,7 +114,7 @@ ToSql.InsertStatement = function(self, node)
 end
 ToSql.Values = function(self, node)
   local sql = map(node.expressions, function(expr)
-    if expr == SqlLiteral then
+    if object_type(expr) == SqlLiteral.__type then
       return self(expr)
     else
       return self:quote(expr, nil)
@@ -208,16 +202,17 @@ ToSql.Table = function(self, node)
   end
 end
 ToSql.quote_table_name = function(self, name)
-  if name == SqlLiteral then
+  if object_type(name) == SqlLiteral.__type then
     return name
   end
   return "\"" .. tostring(name) .. "\""
 end
 ToSql.quote_column_name = function(self, name)
-  if name == SqlLiteral then
+  local t = object_type(name)
+  if t == SqlLiteral.__type then
     return name
   else
-    if name == Attribute then
+    if t == Attribute.__type then
       return "\"" .. tostring(name.name) .. "\""
     else
       return "\"" .. tostring(name) .. "\""
@@ -275,6 +270,9 @@ end
 ToSql.quoted = function(self, node)
   return self:quote(node, self.last_column)
 end
+ToSql["nil"] = function(self, value)
+  return 'NULL'
+end
 ToSql.string = function(self, value)
   return self:quoted(value)
 end
@@ -302,27 +300,18 @@ end
 ToSql.ConstLit = function(self, node)
   return self(node.value)
 end
-ToSql.Null = function(self, node)
-  return 'NULL'
-end
 ToSql.quote = function(self, value, column)
-  if type(value) == 'boolean' then
+  local t = object_type(value)
+  if t == 'boolean' then
     return value and "'t'" or "'f'"
-  else
-    if not value then
-      return 'NULL'
-    else
-      if type(value) == 'number' then
-        return value
-      else
-        if type(value) == 'table' and value.__class == 'Null' then
-          return 'NULL'
-        else
-          return "'" .. tostring(value) .. "'"
-        end
-      end
-    end
   end
+  if value == nil then
+    return 'NULL'
+  end
+  if t == 'number' then
+    return value
+  end
+  return "'" .. tostring(value) .. "'"
 end
 ToSql.column_for = function(self, attr)
   return tostring(attr.name)
@@ -498,7 +487,7 @@ ToSql.Grouping = function(self, node)
   return "(" .. tostring(self(node.value)) .. ")"
 end
 ToSql.FunctionNode = function(self, node)
-  return tostring(self(node.alias)) .. "(" .. tostring(concat((function()
+  return tostring(self(node.name)) .. "(" .. tostring(concat((function()
     local _accum_0 = { }
     local _len_0 = 1
     local _list_0 = node.expressions
@@ -529,9 +518,6 @@ ToSql.Case = function(self, node)
   end
   sql[#sql + 1] = "END"
   return concat(sql, ' ')
-end
-ToSql.Null = function(self)
-  return 'NULL'
 end
 ToSql.IsNull = function(self, node)
   return tostring(self(node.value)) .. " IS NULL"

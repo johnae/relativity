@@ -1,7 +1,10 @@
 local Binary = require('relativity.nodes.binary')
-local Class = require('relativity.class')
-local DeleteStatement = Class('DeleteStatement', Binary)
-DeleteStatement.initialize = function(self, relation, wheres)
-  return Binary.initialize(self, relation, wheres)
-end
-return DeleteStatement
+local define = require('classy').define
+return define('DeleteStatement', function()
+  parent(Binary)
+  return instance({
+    initialize = function(self, relation, wheres)
+      return super(self, relation, wheres)
+    end
+  })
+end)

@@ -41,22 +41,15 @@ merge = function(t1, t2)
   end
   return res
 end
-table.empty = empty
-table.any = any
-table.map = map
-table.merge = merge
-copy_value = function(self, copies)
-  if not (type(self) == 'table') then
-    return self
+table.empty = table.empty or empty
+table.any = table.any or any
+table.map = table.map or map
+table.merge = table.merge or merge
+object_type = function(o)
+  local o_type = type(o)
+  if o_type == 'table' and o.__type then
+    return o.__type
   end
-  if copies and copies[self] then
-    return copies[self]
-  end
-  copies = copies or { }
-  local copy = setmetatable({ }, getmetatable(self))
-  copies[self] = copy
-  for k, v in pairs(self) do
-    copy[copy_value(k, copies)] = copy_value(v, copies)
-  end
-  return copy
+  return o_type
 end
+copy_value = require('classy').copy_value

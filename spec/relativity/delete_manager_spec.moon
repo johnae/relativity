@@ -14,5 +14,5 @@ describe 'DeleteManager', ->
   describe 'where', ->
     it 'uses where values', ->
       dm\from users
-      dm\where users('id')\eq(10)
+      dm\where users'id'\eq(10)
       assert.equal 'DELETE FROM "users" WHERE "users"."id" = 10', dm\to_sql!

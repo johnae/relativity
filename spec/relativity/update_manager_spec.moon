@@ -12,7 +12,7 @@ describe 'UpdateManager', ->
   describe 'set', ->
     it 'updates with null', ->
       um\table users
-      um\set {{users('name'), Relativity.null}}
+      um\set {{users('name'), nil}}
       assert.equal 'UPDATE "users" SET "name" = NULL', um\to_sql!
 
     it 'takes a string', ->

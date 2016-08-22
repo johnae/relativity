@@ -77,7 +77,7 @@ describe 'Relativity', ->
       ]], q\to_sql!
 
     it 'selects users where a condition is not true', ->
-      q = users\where users'id'\eq(10)\Not!
+      q = users\where users'id'\eq(10).not
       assert.equal tr[[
         SELECT FROM "users"
         WHERE NOT ("users"."id" = 10)

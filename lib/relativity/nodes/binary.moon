@@ -1,7 +1,8 @@
-Class = require "relativity.class"
+define = require'classy'.define
 Node = require "relativity.nodes.node"
 
-Binary = Class "Binary", Node
-Binary.initialize = (left, right) =>
-  @left, @right = left, right
-Binary
+define 'Binary', ->
+  parent Node
+  instance
+    initialize: (left, right) =>
+      @left, @right = left, right

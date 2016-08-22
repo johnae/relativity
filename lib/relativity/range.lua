@@ -1,7 +1,8 @@
-local Class = require('relativity.class')
-local Range = Class('Range')
-Range.initialize = function(self, start, finish)
-  self.start = start
-  self.finish = finish
-end
-return Range
+local define = require('classy').define
+return define('Range', function()
+  return instance({
+    initialize = function(self, start, finish)
+      self.start, self.finish = start, finish
+    end
+  })
+end)

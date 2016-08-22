@@ -6,9 +6,9 @@ local InsertManager = require('relativity.select_manager')
 local UpdateManager = require('relativity.select_manager')
 local DeleteManager = require('relativity.delete_manager')
 local CaseBuilder = require('relativity.nodes.case_builder')
-local SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, TableAlias
-SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, Null, TableAlias = Nodes.SqlLiteral, Nodes.FunctionNode, Nodes.ConstLit, Nodes.UnqualifiedName, Nodes.As, Nodes.Null, Nodes.TableAlias
-local null = Null.new()
+local SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, TableAlias
+SqlLiteral, FunctionNode, ConstLit, UnqualifiedName, As, TableAlias = Nodes.SqlLiteral, Nodes.FunctionNode, Nodes.ConstLit, Nodes.UnqualifiedName, Nodes.As, Nodes.TableAlias
+local null = SqlLiteral.new('NULL')
 local star = SqlLiteral.new('*')
 local sql
 sql = function(raw_sql)

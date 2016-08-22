@@ -1,7 +1,8 @@
 Binary = require 'relativity.nodes.binary'
-Class = require 'relativity.class'
+define = require'classy'.define
 
-DeleteStatement = Class 'DeleteStatement', Binary
-DeleteStatement.initialize = (relation, wheres) =>
-  Binary.initialize @, relation, wheres
-DeleteStatement
+define 'DeleteStatement', ->
+  parent Binary
+  instance
+    initialize: (relation, wheres) =>
+      super @, relation, wheres

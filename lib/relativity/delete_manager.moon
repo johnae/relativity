@@ -1,19 +1,17 @@
 TreeManager = require 'relativity.tree_manager'
 DeleteStatement = require 'relativity.nodes.delete_statement'
-Class = require 'relativity.class'
+define = require'classy'.define
 
-DeleteManager = Class 'DeleteManager', TreeManager
-DeleteManager.initialize = =>
-  @super!
-  @ast = DeleteStatement.new!
-  @ctx = @ast
-
-DeleteManager.from = (relation) =>
-  @ast.relation = relation
-  @
-
-DeleteManager.wheres = (list) =>
-  @ast.wheres = list
-  @
-
-DeleteManager
+define 'DeleteManager', ->
+  parent TreeManager
+  instance
+    initialize: =>
+      super @
+      @ast = DeleteStatement.new!
+      @ctx = @ast
+    from: (relation) =>
+      @ast.relation = relation
+      @
+    wheres: (list) =>
+      @ast.wheres = list
+      @

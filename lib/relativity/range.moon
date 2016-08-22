@@ -1,8 +1,6 @@
-Class = require 'relativity.class'
+define = require'classy'.define
 
-Range = Class 'Range'
-Range.initialize = (start, finish) =>
-  @start = start
-  @finish = finish
-
-Range
+define 'Range', ->
+  instance
+    initialize: (start, finish) =>
+      @start, @finish = start, finish
