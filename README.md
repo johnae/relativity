@@ -6,13 +6,13 @@ https://github.com/johnae/relativity
 
 ## Description
 
-Please first note that this is incredibly __raw__, far from completed and will probably need a bit of redesign (I'd like to use more Luaisms in places if possible). There are some missing pieces still. It should be usable however.
+First off - this is a bit __raw__ and may need a bit of redesign (perhaps more Luaisms in places if possible). It should be usable however.
 
 Relativity is sort of [arel](https://github.com/rails/arel) but for moonscript/lua. As far as I know there is nothing like it (other than this) for Lua/MoonScript. This project owes alot to Rubys Arel and also to the nodejs project called [rel](https://github.com/yang/rel). It also shares some caveats with that project, namely:
 
 * No database connections, it only builds queries.
-* Where ruby can do funky stuff, lua sometimes can. When possible
-  Lua-isms are used, otherwise it's a method of some sort.
+* Where Ruby can do funky stuff, Lua sometimes can. When possible
+  Lua-isms are used, otherwise it's a method/function (well - it probably is anyway behind the scenes).
 
 The point of this (as with arel) is to ease the generation of complex SQL queries. This does NOT adapt to different RDBMS systems (yet at least). I only care about Postgres. Shouldn't be that difficult to extend though.
 
@@ -70,7 +70,7 @@ Joins look like this:
     -- => SELECT * FROM "users" INNER JOIN "photos" ON "users"."id" = "photos"."user_id"
 ```
 
-Note that some of the above is taking advantage of MoonScript/Lua allowing to skip the parentheses in certain instances. Eg. this:
+Note that some of the above is taking advantage of MoonScript allowing to skip the parentheses in certain instances. Eg. this:
 
 ```moonscript
 users'id'\eq photos'user_id'
@@ -129,7 +129,13 @@ So OR can also be written like this:
     users\where users'name'\eq'linus' + users'age'\lt 25
 ```
 
-AS works in a similar fashion, but is lowercased since it isn't reserved. AND has the same problem as OR and must be written in title case or, as above, using an LPeg:ish operator - like this:
+AS works in a similar fashion but is lowercased since it isn't reserved:
+
+```moonscript
+    users\project users'id'\as 'user_id' -- => SELECT "users"."id" AS "user_id" FROM "users"
+```
+
+AND has the same problem as OR and must be written in title case or, as above, using an LPeg:ish operator - like this:
 
 ```moonscript
     users\where users'name'\eq'linus' * users'age'\lt 25
@@ -137,7 +143,8 @@ AS works in a similar fashion, but is lowercased since it isn't reserved. AND ha
 
 And is less often used since it's assumed in a where.
 
-There's also Not which is a reserved keyword. For now both of the below do the same thing.
+There's also Not which is a reserved keyword, but that has been made into a getter which can be used lowercase. For now both
+of the below do the same thing:
 
 Using title case:
 
