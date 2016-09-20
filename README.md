@@ -4,6 +4,9 @@
 
 https://github.com/johnae/relativity
 
+Currently I'd say this is a bit experimental and while quite extensive I have yet to actually use it the way I thought I might. Hopefully someone finds it
+interesting.
+
 ## Description
 
 First off - this is a bit __raw__ and may need a bit of redesign (perhaps more Luaisms in places if possible). It should be usable however.
