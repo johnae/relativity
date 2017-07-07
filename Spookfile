@@ -5,66 +5,99 @@ log_level "INFO"
 clr = os.getenv('LIGHT') and 'black' or 'white'
 
 package.loaded.lint_config = pcall -> loadfile('lint_config')()
+:execute = require 'process'
+fs = require 'fs'
+os.execute = execute
 
 lint = require("moonscript.cmd.lint").lint_file
 colors = require "ansicolors"
 to_lua = require("moonscript").to_lua
 
+notify.add 'terminal_notifier'
+pcall notify.add, 'notifier'
+
+{
+  :until_success
+  :command
+  :task_filter
+  :notifies
+} = require 'spookfile_helpers'
+task_list = task_filter fs.is_present
+
 spec_cmd = command "busted"
 exec_cmd = command "spook -f"
-lint_cmd = func name: "Lint", handler: (file, newname) ->
+lint_cmd = (file) ->
+  notify.info "LINTING #{file}"
   result, err = lint file
   if result
     io.stdout\write colors("\n[ %{red}LINT error ]\n%{#{clr}}#{result}\n\n")
-    return false
+    error "Lint error"
   elseif err
     io.stdout\write colors("\n[ %{red}LINT error ]\n#%{#{clr}}{file}\n#{err}\n\n")
-    return false
+    error "Lint error"
   io.stdout\write colors("\n[ %{green}LINT: %{#{clr}}All good ]\n\n")
-  true
 
-to_lua_cmd = func name: "Compile lua", handler: (newname, ev) ->
-  changed_file = ev.changed_file
-  moonfile = io.open(changed_file)
-  content = moonfile\read "*a"
-  moonfile\close!
+to_lua_cmd = (moonfile) ->
+  luafile = moonfile\gsub '%.moon', '.lua'
+  f = io.open(moonfile)
+  content = f\read "*a"
+  f\close!
   as_lua, line_table = to_lua content
+
   unless as_lua
-    io.stdout\write colors("\n[ %{red}Compile to lua error in #{changed_file} ]\n%{#{clr}}#{line_table}\n\n")
-    return false
-  io.stdout\write colors("\n[ %{green}Compiled #{changed_file} to lua file #{newname}: %{#{clr}}All good ]\n\n")
-  lua_file = io.open(newname, 'w+')
-  if lua_file
-    lua_file\write as_lua
-    lua_file\write "\n"
-    lua_file\close!
+    io.stdout\write colors("\n[ %{red}Compile to lua error in #{moonfile} ]\n%{#{clr}}#{line_table}\n\n")
+    error "Compile error"
+
+  io.stdout\write colors("\n[ %{green}Compiled #{moonfile} to lua file #{luafile}: %{#{clr}}All good ]\n\n")
+  f = io.open(luafile, 'w+')
+  if f
+    f\write as_lua
+    f\write "\n"
+    f\close!
   else
-    io.stdout\write colors("\n[ %{red}Compile to lua error ]\n%{#{clr}}Couldn't write to '#{newname}'\n\n")
-  true
+    io.stdout\write colors("\n[ %{red}Compile to lua error ]\n%{#{clr}}Couldn't write to '#{luafile}'\n\n")
+    error "Write error"
 
--- Directories to watch for changes, how to map detected changes to
--- files and what to run
-watch "lib", "vendor", "spec", ->
-  --on_changed "^spec/spec_helper%.moon", -> spec_cmd "spec"
-  on_changed "^spec/(.*)_spec%.moon", (a) ->
-    lint_cmd("spec/#{a}_spec.moon") +
-    spec_cmd("spec/#{a}_spec.moon")
-  on_changed "^lib/relativity%.moon", (a) ->
-    lint_cmd("lib/relativity.moon") +
-    spec_cmd("spec/") +
-    to_lua_cmd("lib/relativity.lua")
-  on_changed "^vendor/classy%.moon", (a) ->
-    lint_cmd("vendor/classy.moon") +
-    to_lua_cmd("vendor/classy.lua") +
-    spec_cmd("spec/")
-  on_changed "^lib/(.*)%.moon", (a) ->
-    lint_cmd("lib/#{a}.moon") +
-    spec_cmd("spec/#{a}_spec.moon") +
-    to_lua_cmd("lib/#{a}.lua")
+test = (event, tasks) ->
+  until_success ->
+    notifies event.path, event, tasks
 
-watch "playground", ->
-  on_changed "^playground/(.*)%.moon", (a) ->
-    exec_cmd("playground/#{a}.moon")
-  on_changed "^playground/(.*)%.lua", (a) -> exec_cmd "playground/#{a}.lua"
+watch ".", ->
+  on_changed "^spec/(.*)_spec%.moon", (event, name) ->
+    test event, task_list(
+      lint_cmd, "spec/#{name}_spec.moon"
+      spec_cmd, "spec/#{name}_spec.moon"
+    )
+  on_changed "^lib/relativity%.moon", (event) ->
+    test event, task_list(
+      lint_cmd, "lib/relativity.moon"
+      spec_cmd, "spec/"
+      to_lua_cmd, event.path
+    )
+  on_changed "^vendor/classy%.moon", (event) ->
+    test event, task_list(
+      lint_cmd, "vendor/classy.moon"
+      to_lua_cmd, event.path
+      spec_cmd, "spec/"
+    )
+    
+  on_changed "^lib/(.*)%.moon", (event, name) ->
+    test event, task_list(
+      lint_cmd, "lib/#{name}.moon"
+      spec_cmd, "spec/#{name}_spec.moon"
+      to_lua_cmd, event.path
+    )
 
-notifier "#{os.getenv('HOME')}/.spook/notifiers"
+  on_changed "^Spookfile$", (event) ->
+    notify.info "Re-executing spook..."
+    reload_spook!
+
+  on_changed "^lint_config%.lua$", (event) ->
+    notify.info "Re-executing spook..."
+    reload_spook!
+
+  on_changed "^playground/(.*)%.moon", (event, name) ->
+    exec_cmd "playground/#{name}.moon"
+
+  on_changed "^playground/(.*)%.lua", (event, name) ->
+    exec_cmd "playground/#{name}.lua"
